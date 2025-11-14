@@ -20,50 +20,38 @@ bool Sonar::sonar_setup()
 
 float Sonar::read_distance()
 {
+    int64_t start = 0;
+    int64_t end = 0;
 
-    int uno = 0;
-    int due = 0;
-    int tre = 0;
-
-    std::cout << "Leggo" << std::endl;
     // Delay to clean the area
     gpio_set_level((gpio_num_t)p_trigPin, 0);
     esp_rom_delay_us(4);
-    // Send the signal
+    // Send the signal to trigger pin
     gpio_set_level((gpio_num_t)p_trigPin, 1);
-    uno = gpio_get_level((gpio_num_t)p_trigPin);
-
-    esp_rom_delay_us(100);
+    esp_rom_delay_us(10);
     gpio_set_level((gpio_num_t)p_trigPin, 0);
-    due = gpio_get_level((gpio_num_t)p_trigPin);
 
-    //gpio_set_level((gpio_num_t)p_echoPin, 1);
     // 2. Aspetta che Echo salga
-    tre = gpio_get_level((gpio_num_t)p_echoPin);
     while (gpio_get_level((gpio_num_t)p_echoPin) == 0) { } //interrupt
-    int64_t start = esp_timer_get_time();
-    std::cout << "Accendo: " << start << std::endl;
-    uno = gpio_get_level((gpio_num_t)p_trigPin);
-    int i = 0;
+    if(gpio_get_level((gpio_num_t)p_echoPin) == 1)
+    {
+        start = esp_timer_get_time();
+    }
+
     // 3. Aspetta che Echo torni basso
     while (gpio_get_level((gpio_num_t)p_echoPin) == 1) 
     {
-        /*i++; 
-        if(i == 10000)
-        {
-            break;
-        }*/
+
     }
-    int64_t end = esp_timer_get_time();
-    std::cout << "Preso: " << end << std::endl;
+    if(gpio_get_level((gpio_num_t)p_echoPin) == 0)
+    {
+        end = esp_timer_get_time();
+    }
 
-    // 4. Calcola durata (microsecondi)
+    // Calculate time of fly of the signal and convert in cm (0.017~1/58)
     int64_t duration = end - start;
-
-    // 5. Converte in cm
-    float distance = duration / 58.0;
+    int64_t distance = duration / 58;
     
-    std::cout << uno << " " << due << " " << tre <<std::endl;
     return distance;
 
 }

@@ -23,6 +23,9 @@
 #define SEN_TRIG GPIO_NUM_18
 #define SEN_ECHO GPIO_NUM_34
 
+TaskHandle_t FrontSensor = NULL;
+//TaskHandle_t Task2Handle = NULL;
+
 using namespace std;
 
 static Main my_main;
@@ -38,28 +41,14 @@ extern "C" void app_main(void)
     gpio_reset_pin((gpio_num_t)BLINK_GPIO);
     gpio_set_direction((gpio_num_t)BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-    int i = 0;
-    
     ESP_ERROR_CHECK(my_main.setup());
     my_main.hello_world(chip_info);
 
     convert_to_morse("SOS", BLINK_GPIO);
-    int counter = 0;
 
-    while (1)
+    while (true)
     {
         my_main.loop();
-        //convert_to_morse("ALESSIA", BLINK_GPIO);
-        //int j = (counter >> 1) & 1; // bit alto
-        //int z = counter & 1; 
-        //counter = (counter + 1) % 4;
-        //std::cout << "j: " << j << ", z: " << z <<std::endl;
-
-        //if(j == 1 && z == 0){front_axle.move_forward();}
-        //else if(j == 0 && z == 1){front_axle.move_backward();}
-        //else{front_axle.stop();}
-        //vTaskDelay(pdMS_TO_TICKS(2000));
-        i++;
     }
 
     ESP_LOGI(LOG_TAG, "Goodbye");
@@ -74,10 +63,16 @@ esp_err_t Main::setup(void)
     //Non crea un nuovo oggetto locale, ma usa l’operatore di assegnazione per copiare i valori dentro il membro esistente.
     front_axle = Axle(GPIO_NUM_22, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "front");
                         //trig,      echo
-    front_sonar = Sonar(GPIO_NUM_18, GPIO_NUM_34, "front");     //(GPIO_NUM_18, GPIO_NUM_19, "front");
-    
-    //esp_err_t gpio_set_direction(gpio_num_t 32, gpio_mode_t output_only)
-
+    front_sonar = Sonar(SEN_TRIG, SEN_ECHO, "front");
+    /*xTaskCreatePinnedToCore(
+    front_sonar.read_distance,             // Task function
+    "front_sonar",           // Task name
+    10000,             // Stack size (bytes)
+    NULL,              // Parameters
+    1,                 // Priority
+    &FrontSensor,      // Task handle
+    1                  // Core 1
+  );*/
 
     ESP_LOGI(LOG_TAG, "Setup complete!");
     
@@ -112,9 +107,6 @@ void Main::loop(void)
     else{
         front_axle.move_forward();
     }
-    //vTaskDelay(pdMS_TO_TICKS(2000));
-    //
     
-    ESP_LOGI(LOG_TAG, "Hello World!");
     vTaskDelay(pdSECOND);
 }
