@@ -1,0 +1,15 @@
+menu "Blink Example Configuration"
+
+config BLINK_GPIO
+    int "Blink GPIO number"
+    default 2
+    help
+        Seleziona il numero del GPIO collegato al LED.
+
+config BLINK_PERIOD
+    int "Blink period (ms)"
+    default 1000
+    help
+        Periodo in millisecondi del lampeggio del LED.
+
+endmenu
