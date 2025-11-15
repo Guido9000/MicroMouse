@@ -18,7 +18,7 @@ bool Sonar::sonar_setup()
 }
 
 
-float Sonar::read_distance()
+float Sonar::read()
 {
     int64_t start = 0;
     int64_t end = 0;

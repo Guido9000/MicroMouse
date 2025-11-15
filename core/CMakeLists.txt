@@ -4,6 +4,7 @@ set(SOURCES
     src/morse.cpp
     src/motor.cpp
     src/sonar.cpp
+    src/tasks.cpp
     )
 
 idf_component_register(SRCS ${SOURCES}

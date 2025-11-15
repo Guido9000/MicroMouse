@@ -23,8 +23,14 @@
 #define SEN_TRIG GPIO_NUM_18
 #define SEN_ECHO GPIO_NUM_34
 
-TaskHandle_t FrontSensor = NULL;
+TaskHandle_t FrontSensor;
+SemaphoreHandle_t xSemaphore = NULL;
 //TaskHandle_t Task2Handle = NULL;
+static Sonar sonar_front(SEN_TRIG, SEN_ECHO, "front");
+static SensorTaskParams front_params = {
+    .sonar = &sonar_front,
+    .name = "front"
+};
 
 using namespace std;
 
@@ -46,12 +52,25 @@ extern "C" void app_main(void)
 
     convert_to_morse("SOS", BLINK_GPIO);
 
-    while (true)
-    {
-        my_main.loop();
-    }
+    //int i = 0;
+    //while (i < 1)
+    //{
+        xSemaphore = xSemaphoreCreateBinary();
+
+        cout << "Timer output in ms program initiation: " << esp_timer_get_time()/1000 << endl;
+        xTaskCreatePinnedToCore(Task_sensors, "Task_sensors", 4096, &front_params, 1, &FrontSensor, 1);
+
+        if(xSemaphoreTake(xSemaphore, portMAX_DELAY))
+        {
+            cout << "Program complete: " << esp_timer_get_time()/1000 << endl;
+        }
+
+        //my_main.loop();
+    //    i++;
+    //}
 
     ESP_LOGI(LOG_TAG, "Goodbye");
+    vTaskDelete(FrontSensor);
 }
 
 esp_err_t Main::setup(void)
@@ -61,19 +80,20 @@ esp_err_t Main::setup(void)
 
     esp_err_t status{ESP_OK};
     //Non crea un nuovo oggetto locale, ma usa l’operatore di assegnazione per copiare i valori dentro il membro esistente.
-    front_axle = Axle(GPIO_NUM_22, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "front");
+    front_axle = Axle(MOT_SLP_PIN, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "front");
                         //trig,      echo
-    front_sonar = Sonar(SEN_TRIG, SEN_ECHO, "front");
+    sonar_front = Sonar(SEN_TRIG, SEN_ECHO, "front");
+    
     /*xTaskCreatePinnedToCore(
-    front_sonar.read_distance,             // Task function
-    "front_sonar",           // Task name
+    sonar_front.read_distance,             // Task function
+    "sonar_front",           // Task name
     10000,             // Stack size (bytes)
     NULL,              // Parameters
     1,                 // Priority
     &FrontSensor,      // Task handle
     1                  // Core 1
   );*/
-
+ 
     ESP_LOGI(LOG_TAG, "Setup complete!");
     
     return status;
@@ -98,7 +118,7 @@ void Main::loop(void)
 {
     float dist = 0;
 
-    dist = front_sonar.read_distance();
+    dist = sonar_front.read();
     cout << dist << " cm" << endl;
     if(dist < 300)
     {
@@ -110,3 +130,34 @@ void Main::loop(void)
     
     vTaskDelay(pdSECOND);
 }
+
+/*void Task_sensors(void* pvParameters)
+{
+    int front;
+    int read_state = 0;
+
+    while(true)
+    {
+        switch(read_state) {
+            case 0:
+                front = sonar_front.read();
+                read_state = 1;
+                break;
+
+            case 1:
+                //left = sonar_left.read();
+                read_state = 2;
+                break;
+
+            case 2:
+                //right = sonar_right.read();
+                read_state = 0;
+                break;
+        }
+
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
+
+    vTaskDelete(NULL);
+}
+*/

@@ -16,7 +16,7 @@ extern "C" class Sonar
             if(sonar_setup()){std::cout << name << " sonar is online" << std::endl;}
         }
 
-        float read_distance();
+        float read();
 
     private:
         int p_trigPin;
