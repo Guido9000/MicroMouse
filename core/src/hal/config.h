@@ -1,3 +1,5 @@
+#pragma once
+
 // Maths
 constexpr float PI = 3.14159f;
 

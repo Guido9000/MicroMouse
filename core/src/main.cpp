@@ -2,7 +2,7 @@
 // #include "driver/gpio.h"    //General Purpose Input/Output
 // #include "esp_log.h"
 
-#include "main.h"
+#include "inc/main.h"
 #include <thread>
 #include <chrono>
 
@@ -23,6 +23,7 @@ void Main::loop() {
         drive_.moveForward(SPEED_EXPLORE_MM_S);
     }
 
+    // Select clock
     std::this_thread::sleep_for(std::chrono::seconds(1));
     // vTaskDelay(pdSECOND);
 }
