@@ -3,26 +3,40 @@
 // #include "esp_log.h"
 
 #include <iostream>
-#include "../src/hal/interfaces.h"
-#include "../src/hal/mock_sensor.h"
-#include "../src/navigation/maze.cpp"
-#include "../inc/log.h"
+#include "interfaces.h"
+#include "mock_sensor.h"
+#include "maze.cpp"
+#include "navigation.cpp"
+#include "log.h"
+#include "maze_solver.cpp"
 
 
 int main() {
     MockSensor sensor;
     MockMotor motor;
     maze_grid grid;
+    ISolver* solver_ = new RightHandSolver();
 
+    // Set wall distance by hand
     sensor.setNextReading(20.0f);
 
     std::cout << "Distanza: " << sensor.getDistanceMM() << " mm\n";
-    std::cout << "Parete: "   << sensor.isWallDetected() << "\n";
+    if(sensor.isWallDetected())
+    {
+        LOG_INFO("Sensor", "Wall detected");
 
-    // std::cout << "Cell number: " <<  << std::endl;
-    grid.setWall(2, 3, SUD);
-    grid.hasWall(2, 3, SUD);
-    grid.print(2,3);
+        grid.setWall(7, 7, WEST);
+        cout << grid.isGoal(8,8) << endl;
+        // grid.hasWall(2, 3, EAST);
+        // grid.print(2,3);
+        // nav.turn_right();
+        // nav.turn_right();
+        // nav.turn_right();
+        // nav.turn_right();
+        // nav.turn_right();
+        // nav.turn_left();
+        // nav.opposite_direction();       
+    }
 
     return 0;
 }

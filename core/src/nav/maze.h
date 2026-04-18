@@ -1,14 +1,20 @@
 #pragma once
 
 #include <iostream>
-#include "hal/config.h"
-#include "../../inc/log.h"
+#include "config.h"
+#include "log.h"
 
+// enum Direction {
+//     NORTH  = 1 << 0,
+//     SOUTH   = 1 << 1,
+//     WEST = 1 << 2,
+//     EAST   = 1 << 3
+// };
 enum Direction {
-    NORD  = 1 << 0,
-    SUD   = 1 << 1,
-    OVEST = 1 << 2,
-    EST   = 1 << 3
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
 };
 const uint16_t VISITED    = 0x10;
 const uint16_t SOLUTION   = 0x20;
@@ -22,14 +28,17 @@ struct maze_cell
 extern "C" class maze_grid
 { 
     public:
-        bool hasWall(uint8_t x, uint8_t y, Direction dir);
+        bool hasWall(uint8_t x, uint8_t y, Direction dir) const;
         void setWall(uint8_t x, uint8_t y, Direction dir);
-        bool isVisited(uint8_t x, uint8_t y);
+        void setWallCell(uint8_t x, uint8_t y, Direction dir);
+        bool setNeighbor(uint8_t x, uint8_t y, Direction dir);
+        bool isVisited(uint8_t x, uint8_t y) const;
         void setVisited(uint8_t x, uint8_t y);
-        uint8_t getFlood(uint8_t x, uint8_t y);
+        uint8_t getFlood(uint8_t x, uint8_t y) const;
         void setFlood(uint8_t x, uint8_t y, uint8_t value);
-        // maze_cell& getCell(uint8_t x, uint8_t y);
+        bool isGoal(uint8_t x, uint8_t y) const;
         void print(uint8_t x, uint8_t y);
+        Direction opposite_dir(Direction dir);
 
     private:    // non voglio che il codice esterno li chiami per sbaglio
         maze_cell cells_[256];  //16*16
