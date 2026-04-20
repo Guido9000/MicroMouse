@@ -1,5 +1,5 @@
 #include "esp_log.h"
-#include "main.h"
+#include "main_test.h"
 
 // Scegli UNO dei due blocchi:
 
