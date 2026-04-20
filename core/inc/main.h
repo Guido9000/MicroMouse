@@ -7,7 +7,7 @@
 #include "freertos/timers.h"
 #include "freertos/task.h"  //
 #include "freertos/semphr.h"  //
-#include "driver/gpio.h"
+#include "driver/gpio.h"    // For GPIO control
 #include "esp_chip_info.h"  //
 #include "esp_flash.h"
 #include "esp_system.h"

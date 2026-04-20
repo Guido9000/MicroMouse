@@ -17,6 +17,15 @@
 #define SEN_ECHO GPIO_NUM_34
 
 
+// PWM for motors
+#define MOTOR_PWM_FREQ  1000                  // Frequency in Hz for PWM
+#define MOTOR_PWM_CHANNEL LEDC_CHANNEL_0
+#define MOTOR_PWM_MODE   LEDC_HIGH_SPEED_MODE
+#define MOTOR_PWM_TIMER  LEDC_TIMER_0
+#define MOTOR_PWM_RES    LEDC_TIMER_10_BIT    // PWM resolution (10-bit)    //TODO reduce to LEDC_TIMER_8_BIT
+#define MAX_DUTY_CYCLE   1023                 // Maximum duty cycle for 10-bit resolution //TODO 8bit 1023 -> 255
+#define MIN_DUTY_CYCLE   600
+///////////////////////////////////////////////////////////
 
 
 

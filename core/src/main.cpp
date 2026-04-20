@@ -3,6 +3,7 @@
 #include "esp_log.h"
 
 #include "inc/main.h"
+#include "pin.h"
 #include <thread>
 #include <chrono>
 
@@ -64,15 +65,15 @@ extern "C" void app_main(void)
     //{
         xSemaphore = xSemaphoreCreateBinary();
 
-        cout << "Timer output in ms program initiation: " << esp_timer_get_time()/1000 << endl;
-        xTaskCreatePinnedToCore(Task_sensors, "Task_sensors", 4096, &front_params, 1, &FrontSensor, 1);
+        // cout << "Timer output in ms program initiation: " << esp_timer_get_time()/1000 << endl;
+        // xTaskCreatePinnedToCore(Task_sensors, "Task_sensors", 4096, &front_params, 1, &FrontSensor, 1);
 
-        if(xSemaphoreTake(xSemaphore, portMAX_DELAY))
-        {
-            cout << "Program complete: " << esp_timer_get_time()/1000 << endl;
-        }
+        // if(xSemaphoreTake(xSemaphore, portMAX_DELAY))
+        // {
+        //     cout << "Program complete: " << esp_timer_get_time()/1000 << endl;
+        // }
 
-        //my_main.loop();
+        my_main.loop();
     //    i++;
     //}
 
@@ -127,7 +128,7 @@ void Main::loop(void)
 
     dist = sonar_front.read();
     cout << dist << " cm" << endl;
-    if(dist < 300)
+    if(dist < 0)
     {
         front_axle.stop();
     }
