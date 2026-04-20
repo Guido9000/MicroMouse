@@ -1,6 +1,6 @@
-// #define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
-// #include "driver/gpio.h"    //General Purpose Input/Output
-// #include "esp_log.h"
+#define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
+#include "driver/gpio.h"    //General Purpose Input/Output
+#include "esp_log.h"
 
 #include "inc/main.h"
 #include <thread>
@@ -9,24 +9,24 @@
 #define LOG_TAG "MAIN"
 
 
-esp_err_t Main::setup() {
-    ESP_LOGI(LOG_TAG, "Setup complete!");
-    return ESP_OK;
-}
+// esp_err_t Main::setup() {
+//     ESP_LOGI(LOG_TAG, "Setup complete!");
+//     return ESP_OK;
+// }
 
-void Main::loop() {
-    float dist = frontSensor_.getDistanceMM();
+// void Main::loop() {
+//     float dist = frontSensor_.getDistanceMM();
 
-    if (dist < 300.0f) {
-        drive_.stop();
-    } else {
-        drive_.moveForward(SPEED_EXPLORE_MM_S);
-    }
+//     if (dist < 300.0f) {
+//         drive_.stop();
+//     } else {
+//         drive_.moveForward(SPEED_EXPLORE_MM_S);
+//     }
 
-    // Select clock
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    // vTaskDelay(pdSECOND);
-}
+//     // Select clock
+//     std::this_thread::sleep_for(std::chrono::seconds(1));
+//     // vTaskDelay(pdSECOND);
+// }
 
 
 //////////////////// OLD TEST PER INIZIARE

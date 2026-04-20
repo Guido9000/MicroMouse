@@ -1,7 +1,7 @@
 #define LOG_LEVEL_LOCAL LOG_DEBUG
 #define HOST_BUILD
 // #include "esp_log.h"
-
+#pragma once
 #include <iostream>
 #include "interfaces.h"
 #include "mock_sensor.h"
@@ -9,6 +9,7 @@
 #include "navigation.cpp"
 #include "log.h"
 #include "maze_solver.cpp"
+#include "robot.cpp"
 
 
 int main() {
