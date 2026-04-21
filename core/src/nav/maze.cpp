@@ -3,13 +3,14 @@
 #include "config.h"
 #include "maze.h"
 #include "log.h"
+#include "navigation.h"
 
 using namespace std;
 
 // uint8_t getFlood(uint8_t x, uint8_t y);
 // void setFlood(uint8_t x, uint8_t y, uint8_t value);
 
-uint8_t maze_grid::index(uint8_t x, uint8_t y) const
+uint8_t mazeGrid::index(uint8_t x, uint8_t y) const
 {
     // TODO: Convert in verbose
     std::cout << "Cell coordinates (" << int(x) << "," << int(y) << ") -> ";
@@ -19,25 +20,7 @@ uint8_t maze_grid::index(uint8_t x, uint8_t y) const
 }
 
 
-Direction maze_grid::opposite_dir(Direction dir){
-    if(dir == NORTH){
-        dir = SOUTH;
-    }
-    else if(dir == SOUTH){
-        dir = NORTH;
-    }
-    else if(dir == EAST){
-        dir = WEST;
-    }
-    else if(dir == WEST){
-        dir = EAST;
-    }
-
-    return dir;
-}
-
-
-bool maze_grid::hasWall(uint8_t x, uint8_t y, Direction dir) const
+bool mazeGrid::hasWall(uint8_t x, uint8_t y, Direction dir) const
 {
     const maze_cell& tmp_cell = cells_[index(x,y)];
 
@@ -52,14 +35,14 @@ bool maze_grid::hasWall(uint8_t x, uint8_t y, Direction dir) const
 }
 
 
-void maze_grid::setWall(uint8_t x, uint8_t y, Direction dir)
+void mazeGrid::setWall(uint8_t x, uint8_t y, Direction dir)
 {
     setWallCell(x, y, dir);
     setNeighbor(x, y, dir);
 }
 
 
-void maze_grid::setWallCell(uint8_t x, uint8_t y, Direction dir)
+void mazeGrid::setWallCell(uint8_t x, uint8_t y, Direction dir)
 {
     maze_cell& tmp_cell = cells_[index(x,y)];
 
@@ -69,46 +52,40 @@ void maze_grid::setWallCell(uint8_t x, uint8_t y, Direction dir)
     LOG_VERBOSE("Maze", "The wall is set");
 }
 
-bool maze_grid::setNeighbor(uint8_t x, uint8_t y, Direction dir)
-{
-    if(dir == NORTH && x != 0){
-        x = x - 1;
-    }
-    else if(dir == SOUTH && x != 15){
-        x = x + 1;
-    }
-    else if(dir == WEST && y != 0){
-        y = y - 1;
-    }
-    else if(dir == EAST && x != 15){
-        y = y + 1;
-    }
-    else{
-        return 0;
-    }
 
-    dir = opposite_dir(dir);
-    setWallCell(x, y, dir);
+bool mazeGrid::setNeighbor(uint8_t x, uint8_t y, Direction dir)
+{
+    // No adiacent cell in such direction
+    if(isBoarder(x, y, dir))    {return false;}
+
+    // TODO Check axis
+    //Move to adiacent cell
+    if(dir == NORTH)     {y += 1;}
+    else if(dir == SOUTH){y -= 1;}
+    else if(dir == EAST) {x += 1;}
+    else if(dir == WEST) {x -= 1;}
+
+    setWallCell(x, y, backDirection(dir));
 
     LOG_VERBOSE("Maze", "The wall in the neighbor cell is set");
-    return 1;
+    return true;
 }
 
-bool maze_grid::isVisited(uint8_t x, uint8_t y) const
+bool mazeGrid::isVisited(uint8_t x, uint8_t y) const
 {
     const maze_cell& tmp_cell = cells_[index(x,y)];
 
     if(tmp_cell.walls & VISITED){
         LOG_VERBOSE("Maze", "The cell was already visited");
-        return 1;
+        return true;
     }
 
     LOG_VERBOSE("Maze", "The cell is not visited already");
-    return 0;
+    return false;
 }
 
 
-void maze_grid::setVisited(uint8_t x, uint8_t y)
+void mazeGrid::setVisited(uint8_t x, uint8_t y)
 {
     maze_cell& tmp_cell = cells_[index(x,y)];
 
@@ -118,7 +95,7 @@ void maze_grid::setVisited(uint8_t x, uint8_t y)
 }
 
 
-void maze_grid::print(uint8_t x, uint8_t y)
+void mazeGrid::printCellState(uint8_t x, uint8_t y)
 {
     maze_cell tmp_cell = cells_[index(x,y)];
 
@@ -128,7 +105,18 @@ void maze_grid::print(uint8_t x, uint8_t y)
 
 
 // Define goal at the center of the maze
-bool maze_grid::isGoal(uint8_t x, uint8_t y) const {
+bool mazeGrid::isGoal(uint8_t x, uint8_t y) const {
     return (x == MAZE_WIDTH/2 - 1 || x == MAZE_WIDTH/2) &&
            (y == MAZE_HEIGHT/2 - 1 || y == MAZE_HEIGHT/2);
+}
+
+
+bool mazeGrid::isBoarder(uint8_t x, uint8_t y, Direction dir) const
+{
+    if      (dir == NORTH && y == MAZE_HEIGHT - 1)  {return true;}
+    else if (dir == SOUTH && y == 0)                {return true;}
+    else if (dir == EAST && y == MAZE_WIDTH - 1)    {return true;}
+    else if (dir == WEST && y == 0)                 {return true;}
+
+    else {return false;}
 }

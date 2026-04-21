@@ -2,17 +2,35 @@
 
 #include <iostream>
 #include "navigation.h"
+#include "driver.h"
+#include "sonar.h"
+#include "maze_solver.h"
+#include "maze.h"
 
-/* The degrees of rotation are clockwise following the compass */
 
 extern "C" class Robot
 { 
     public:
+        void init();
+        bool explore();
+        bool sprint();
 
     private:
-        float calculateRotation(const Direction OldDir, const Direction NewDir);
-        bool e_turn(const float degrees);
-        bool e_goAhead();
-        float sensors();
-        bool motor_setup();
+        // Navigation
+        mazeGrid    maze_;
+        Navigation  navigator_;
+        ISolver*    solver_;
+
+        // Hardware
+        Axle    rearAxle_;
+        Sonar   frontSensor_;
+        Sonar   leftSensor_;
+        Sonar   rightSensor_;
+ 
+        void rotateByDegrees(float degrees);
+        void stop();
+        void reachCenter();
+        bool isCentered();
+        float calibrateDist();
+        void keepEqDistance();
 };

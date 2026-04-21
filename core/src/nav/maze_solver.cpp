@@ -14,7 +14,7 @@
 //         flag = 1
 
 
-bool RightHandSolver::solver(const maze_grid& maze, const Position& actual_position)
+bool RightHandSolver::solver(const mazeGrid& maze, const Position& actual_position)
 {
     Direction goTo;
     // index(0, 0) get start
@@ -25,7 +25,7 @@ bool RightHandSolver::solver(const maze_grid& maze, const Position& actual_posit
     {
         // center_in_the_cell
         // read the walls
-        goTo = nextMove(maze, actual_position);
+        goTo = nextStep(maze, actual_position);
 
     }
 
@@ -34,7 +34,7 @@ bool RightHandSolver::solver(const maze_grid& maze, const Position& actual_posit
 }
 
 // Given a position in the maze, get the next move following the righthand rule
-Direction RightHandSolver::nextMove(const maze_grid& maze, const Position& actual_position)
+Direction RightHandSolver::nextStep(const mazeGrid& maze, const Position& actual_position)
 {
     Navigation nav;
     Direction actual_direction = actual_position.heading;

@@ -16,6 +16,7 @@ extern "C" class Sonar
             if(sonar_setup()){std::cout << name << " sonar is online" << std::endl;}
         }
 
+        bool theresWall();
         float read();
 
     private:

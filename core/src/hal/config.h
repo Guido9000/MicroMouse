@@ -14,6 +14,7 @@ constexpr uint8_t MAZE_WIDTH         = 16;
 constexpr uint8_t MAZE_HEIGHT        = 16;
 constexpr float   CELL_SIZE_MM       = 180.0f;
 constexpr float   WALL_THICKNESS_MM  = 12.0f;
+constexpr float   MAX_WALL_DIST      = 80.0f;   //TODO check
 
 // Control parameters
 constexpr float PID_SPEED_KP         = 1.2f;

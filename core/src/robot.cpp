@@ -1,53 +1,136 @@
 #include "robot.h"
 
-float calculateRotation(const Direction OldDir, const Direction NewDir)
+void Robot::init()
 {
-    float degrees = 0.0;
+    solver_ = new RightHandSolver;
 
-    for(int i = 0; i < 4; i++)
-    {
-        if (NewDir == ((OldDir + i) % 4))
-        {
-            break;
-        }
-        degrees += 90.0;
-    }
-    if (degrees > 180.0)
-    {
-        degrees = (degrees - 360.0);
-    }
-
-    return degrees;
+    rearAxle_ = Axle(MOT_SLP_PIN, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "rear");
+    frontSensor_ = Sonar(SEN_TRIG, SEN_ECHO, "front");
+    // leftSensor_ = Sonar(SEN_TRIG, SEN_ECHO, "left");
+    // rightSensor_ = Sonar(SEN_TRIG, SEN_ECHO, "right");
 }
 
 
-bool Robot::e_turn(const float degrees)
+bool Robot::explore()
 {
+    Direction next;
+    Position myPosition = navigator_.getPosition();
 
+    // use navigation to find the goal
+    while(!maze.isGoal(myPosition.x, myPosition.y)
+    {
+        next = solver_.nextStep(const mazeGrid& maze, const Position& actual_position);
+        rearAxle_.nextMove(next);
+        navigator_.setPosition(/* TODO ADJUST NEXT to be Position, not Direction */);
+        navigator_.updateWalls(maze, myPosition.x, myPosition.y, myPosition.heading);
+    }
+
+    LOG_INFO("Robot", "Exploration is complete")
+    return true;
+}
+
+
+bool Robot::sprint()
+{
+    // read the maze to sprint
+
+    return true;
+}
+
+
+void Robot::rotateByDegrees(float degrees)
+{
     if(degrees > 0)
     {
-        // turn right
+        // applica spinta positiva a motore dx
+        // applica spinta negativa a motore sx
+        // stop
     }
     else if(degrees < 0)
     {
-        // turn left
+        // applica spinta positiva a motore sx
+        // applica spinta negativa a motore dx
+        // stop
     }
-    
-    // Send command and detach (Switch on left engine +1 && switch on right engine -1)
-    // Count time (Wait the proper time to get corresponding degrees turn)
-    // Stop engines (+ semaphore?)
-
-    // Maneuver completed
-    return 1;
 }
 
 
-bool Robot::e_goAhead()
+void Robot::stop()
 {
-    // Send command and detach (Switch on left engine +1 && switch on right engine +1)
-    // Count time (Calculate distance to cover the space from center to center of cells)
-    // Stop engines (+ semaphore?)
 
-    // Maneuver completed
-    return 1;
 }
+
+
+void Robot::reachCenter()
+{
+
+}
+
+
+bool Robot::isCentered()
+{
+
+    return 0;
+}
+
+
+float Robot::calibrateDist()
+{
+    MockSensor frontSensor;
+    if(isCentered() == 1)
+    {
+        frontSensor.getDistanceMM();
+        //TODO: Correct distance. Go to proper center
+    }
+
+    return 0;
+}
+
+//Center the robot in the cell to keep same distance from left and right
+void Robot::keepEqDistance()
+{
+    // Possible first approach:
+    // 1) rileva differenza dx vs sx
+    // 2) applica rotazione verso centro
+    // 3) avanza fino a rendere dx = sx
+    // 4) applica anti rotazione
+
+    // TODO: left and right sensor must be passed from the extern
+    MockSensor leftSensor, rightSensor;
+    float gap;
+    float leftWheelSpeed;
+    float rightWheelSpeed;
+    float normConst;
+
+    normConst = leftSensor.getDistanceMM() + rightSensor.getDistanceMM();
+    gap = leftSensor.getDistanceMM() - rightSensor.getDistanceMM();
+
+    if(leftSensor.isWallDetected() && rightSensor.isWallDetected())
+    {
+        if(abs(gap) > 5.0)
+        {
+            if(gap > 0)
+            {
+                rotateByDegrees(-45.0);
+                // Go ahead until gap = 0; (reachCenter?)
+                rotateByDegrees(45.0);
+
+                // TODO
+                // Dynamic algorithm
+                // Reduce right wheel speed
+                // rightWheelSpeed = 0.2 * gap / normConst;
+            }
+            else
+            {
+                rotateByDegrees(45.0);
+                // Go ahead until gap = 0;
+                rotateByDegrees(-45.0);
+                
+                // TODO
+                // Dynamic algorithm
+                // Reduce left wheel speed
+                // leftWheelSpeed = 0.2 * gap / normConst;
+            }
+        }
+    }
+} 

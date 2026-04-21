@@ -9,13 +9,13 @@
 #include "navigation.cpp"
 #include "log.h"
 #include "maze_solver.cpp"
-#include "robot.cpp"
+#include "controller.cpp"
 
 
 int main() {
     MockSensor sensor;
     MockMotor motor;
-    maze_grid grid;
+    mazeGrid grid;
     ISolver* solver_ = new RightHandSolver();
 
     // Set wall distance by hand
@@ -36,8 +36,22 @@ int main() {
         // nav.turn_right();
         // nav.turn_right();
         // nav.turn_left();
-        // nav.opposite_direction();       
+ 
     }
 
     return 0;
 }
+
+
+// esp_err_t Main::setup() {
+//     robot_.init();
+//     return ESP_OK;
+// }
+
+// void Main::solveTheMaze() {
+//     robot_.explore();    // esplora finché non trova il centro
+// }
+
+// void Main::runInTheMaze() {
+//     robot_.sprint();     // corre il percorso ottimale
+// }

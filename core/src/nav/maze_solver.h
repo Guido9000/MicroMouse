@@ -10,7 +10,7 @@ extern "C" class ISolver
 { 
     public:
         virtual ~ISolver() = default;        // distruttore virtuale, implementazione default
-        virtual Direction nextMove(const maze_grid& maze, const Position& actual_position) = 0; // metodo puro, nessuna implementazione
+        virtual Direction nextStep(const mazeGrid& maze, const Position& actual_position) = 0; // metodo puro, nessuna implementazione
     private:
 };
 
@@ -18,8 +18,8 @@ extern "C" class ISolver
 extern "C" class RightHandSolver : public ISolver
 { 
     public:
-        bool solver(const maze_grid& maze, const Position& actual_position);
-        Direction nextMove(const maze_grid& maze, const Position& actual_position) override;
+        bool solver(const mazeGrid& maze, const Position& actual_position);
+        Direction nextStep(const mazeGrid& maze, const Position& actual_position) override;
 
     private:
 };

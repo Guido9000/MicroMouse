@@ -3,130 +3,43 @@
 #include "navigation.h"
 #include "mock_sensor.h"
 #include "config.h"
+#include "maze.h"
+#include "direction.h"
 
-Direction Navigation::turnRight(Direction heading)
+Position Navigation::getPosition() const
 {
-
-    // TODO: Convert in verbose
-    std::cout << "Right is " << ((heading + 1) % 4) << std::endl;
-    // TODO Blink once
-    return static_cast<Direction>((heading + 1) % 4);
+    return actual_position_;
 }
 
 
-Direction Navigation::turnLeft(Direction heading)
+bool Navigation::setPosition(Position new_position)
 {
+    actual_position_.x = new_position.x;
+    actual_position_.y = new_position.y;
+    actual_position_.heading = new_position.heading;
 
-    // TODO: Convert in verbose
-    std::cout << "Left is " << ((heading + 3) % 4) << std::endl;
-    // TODO Blink three times
-    return static_cast<Direction>((heading + 3) % 4);
+    return true;
 }
 
 
-Direction Navigation::turnBack(Direction heading)
+bool Navigation::updateWalls(mazeGrid& maze, const Sonar& front_S, const Sonar& left_S, const Sonar& right_S)
 {
+    Direction ahead = actual_position_.heading;
+    Direction left = leftDirection(actual_position_.heading);
+    Direction right = rightDirection(actual_position_.heading);
 
-    // TODO: Convert in verbose
-    std::cout << "The opposite direction is " << ((heading + 2) % 4) << std::endl;
-    // TODO Blink once long
-    return static_cast<Direction>((heading + 2) % 4);
-}
-
-
-void Navigation::rotateByDegrees(float degrees)
-{
-    if(degrees > 0)
+    if(front_S.thereswall())
     {
-        // applica spinta positiva a motore dx
-        // applica spinta negativa a motore sx
-        // stop
+        maze.setWall(actual_position_.x, actual_position_.y, ahead);
     }
-    else if(degrees < 0)
+    if(left_S.thereswall())
     {
-        // applica spinta positiva a motore sx
-        // applica spinta negativa a motore dx
-        // stop
+        maze.setWall(actual_position_.x, actual_position_.y, left);
     }
-}
-
-
-void Navigation::stop()
-{
-
-}
-
-
-void Navigation::reachCenter()
-{
-
-}
-
-
-bool Navigation::isCentered()
-{
-
-    return 0;
-}
-
-
-float Navigation::calibrateDist()
-{
-    MockSensor frontSensor;
-    if(isCentered() == 1)
+    if(right_S.thereswall())
     {
-        frontSensor.getDistanceMM();
-        //TODO: Correct distance. Go to proper center
+        maze.setWall(actual_position_.x, actual_position_.y, right);
     }
-
-    return 0;
+    
+    return true;
 }
-
-//Center the robot in the cell to keep same distance from left and right
-void Navigation::keepEqDistance()
-{
-    // Possible first approach:
-    // 1) rileva differenza dx vs sx
-    // 2) applica rotazione verso centro
-    // 3) avanza fino a rendere dx = sx
-    // 4) applica anti rotazione
-
-    // TODO: left and right sensor must be passed from the extern
-    MockSensor leftSensor, rightSensor;
-    float gap;
-    float leftWheelSpeed;
-    float rightWheelSpeed;
-    float normConst;
-
-    normConst = leftSensor.getDistanceMM() + rightSensor.getDistanceMM();
-    gap = leftSensor.getDistanceMM() - rightSensor.getDistanceMM();
-
-    if(leftSensor.isWallDetected() && rightSensor.isWallDetected())
-    {
-        if(abs(gap) > 5.0)
-        {
-            if(gap > 0)
-            {
-                rotateByDegrees(-45.0);
-                // Go ahead until gap = 0; (reachCenter?)
-                rotateByDegrees(45.0);
-
-                // TODO
-                // Dynamic algorithm
-                // Reduce right wheel speed
-                // rightWheelSpeed = 0.2 * gap / normConst;
-            }
-            else
-            {
-                rotateByDegrees(45.0);
-                // Go ahead until gap = 0;
-                rotateByDegrees(-45.0);
-                
-                // TODO
-                // Dynamic algorithm
-                // Reduce left wheel speed
-                // leftWheelSpeed = 0.2 * gap / normConst;
-            }
-        }
-    }
-} 

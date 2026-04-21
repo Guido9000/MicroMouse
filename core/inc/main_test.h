@@ -32,6 +32,9 @@ public:
 
     esp_err_t setup();
     void      loop();
+    void      Robot();
+    bool      solveTheMaze();
+    bool      runInTheMaze();
 
 private:
     IDistanceSensor& frontSensor_;

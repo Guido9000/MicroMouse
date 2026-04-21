@@ -37,7 +37,8 @@ bool Motor::setSpeed(int throttle)
 }
 
 
-int Motor::speedToDuty(int throttle) {
+int Motor::speedToDuty(int throttle)
+{
     int full_throttle = 100;
 
     if(speed < 0 || speed > 100) 
@@ -50,6 +51,13 @@ int Motor::speedToDuty(int throttle) {
         return 0;
     }
     return MIN_DUTY_CYCLE + throttle * (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) / full_throttle;
+}
+
+
+void stop()
+{
+    gpio_set_level(p_InPin1, 0);
+    gpio_set_level(p_InPin2, 0);
 }
 
 

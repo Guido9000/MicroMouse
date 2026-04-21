@@ -18,6 +18,7 @@ extern "C" class Axle
             if(driver_setup()){std::cout << name << " axle is online" << std::endl;}
         }
 
+        bool nextMove();
         void move_forward();
         void move_backward();
         void stop();
