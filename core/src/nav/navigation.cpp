@@ -6,6 +6,7 @@
 #include "maze.h"
 #include "direction.h"
 
+
 Position Navigation::getPosition() const
 {
     return actual_position_;

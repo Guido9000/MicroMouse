@@ -6,6 +6,7 @@
 #include "sonar.h"
 #include "maze_solver.h"
 #include "maze.h"
+#include "odometry.h"
 
 
 extern "C" class Robot
@@ -20,6 +21,7 @@ extern "C" class Robot
         mazeGrid    maze_;
         Navigation  navigator_;
         ISolver*    solver_;
+        Odometry    odometry_;
 
         // Hardware
         Axle    rearAxle_;
@@ -29,7 +31,7 @@ extern "C" class Robot
  
         void rotateByDegrees(float degrees);
         void stop();
-        void reachCenter();
+        bool nextCenterReached();
         bool isCentered();
         float calibrateDist();
         void keepEqDistance();

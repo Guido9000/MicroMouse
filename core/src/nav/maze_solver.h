@@ -18,7 +18,6 @@ extern "C" class ISolver
 extern "C" class RightHandSolver : public ISolver
 { 
     public:
-        bool solver(const mazeGrid& maze, const Position& actual_position);
         Direction nextStep(const mazeGrid& maze, const Position& actual_position) override;
 
     private:

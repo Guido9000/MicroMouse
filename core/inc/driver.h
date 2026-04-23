@@ -4,6 +4,7 @@
 #include <string>
 #include "driver/gpio.h"
 #include "motor.h"
+#include "direction.h"
 
 extern "C" class Axle
 { 
@@ -18,7 +19,8 @@ extern "C" class Axle
             if(driver_setup()){std::cout << name << " axle is online" << std::endl;}
         }
 
-        bool nextMove();
+        bool prepareNextMove();
+        bool NextMove();
         void move_forward();
         void move_backward();
         void stop();

@@ -4,7 +4,7 @@
 constexpr float PI = 3.14159f;
 
 // MicroMouse
-constexpr float WHEEL_DIAMETER_MM    = 64.0f;
+constexpr float WHEEL_DIAMETER_MM    = 70.0f;
 constexpr float WHEEL_BASE_MM        = 90.0f;  // distanza tra le ruote
 constexpr float ENCODER_CPR          = 360.0f; // counts per revolution
 constexpr float MM_PER_COUNT         = (PI * WHEEL_DIAMETER_MM) / ENCODER_CPR;

@@ -2,36 +2,7 @@
 #include "maze.h"
 #include "navigation.h"
 
-// while(flag < 1) repeat until goal
-//     go straight
-//     take note of the walls
-    
-//     if you can turn right
-//         turn right
-//     if blind spot
-//         turn back
-//     if goal
-//         flag = 1
 
-
-bool RightHandSolver::solver(const mazeGrid& maze, const Position& actual_position)
-{
-    Direction goTo;
-    // index(0, 0) get start
-    // center_in_the_cell
-    // get the walls from sensors
-
-    while(!maze.isGoal(actual_position.x, actual_position.y))
-    {
-        // center_in_the_cell
-        // read the walls
-        goTo = nextStep(maze, actual_position);
-
-    }
-
-    // Congratulations, it's done!
-    return 1;
-}
 
 // Given a position in the maze, get the next move following the righthand rule
 Direction RightHandSolver::nextStep(const mazeGrid& maze, const Position& actual_position)

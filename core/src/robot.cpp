@@ -19,10 +19,38 @@ bool Robot::explore()
     // use navigation to find the goal
     while(!maze.isGoal(myPosition.x, myPosition.y)
     {
-        next = solver_.nextStep(const mazeGrid& maze, const Position& actual_position);
-        rearAxle_.nextMove(next);
-        navigator_.setPosition(/* TODO ADJUST NEXT to be Position, not Direction */);
-        navigator_.updateWalls(maze, myPosition.x, myPosition.y, myPosition.heading);
+        next = solver_.nextStep(const mazeGrid& maze, const Position& actual_position); // next is the rotation to perform
+        rearAxle_.prepareNextMove(next); // rotate
+        odometry_.takeTime(); // inizializza cronometro per odometria ruote
+        odometry_.updateSensorLastMeasure(frontSensor_.read()); // initialize front sensor for odometry
+
+        rearAxle_.move_forward() // Move forward into next corridor
+        rearAxle_.nextCenterReached(); // 
+
+        // Almost reaching the next center cell: update navigation position and set walls
+        if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM * 0.9)
+        {
+            navigator_.setPosition(/* TODO ADJUST NEXT to be Position, not Direction */);
+            navigator_.updateWalls(maze, myPosition.x, myPosition.y, myPosition.heading);
+            next = solver_.nextStep(maze, actual_position); // be prepared for next action
+        }
+
+        // Reach next center cell with wheelSpaceTraveled(time, speed) = CELL_SIZE_MM and iterate the while loop
+        if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM)
+        {
+            // if turn available/necessary, be ready to stop
+            if (myPosition.heading != next)
+            {
+                //stop, next iteration you'll turn
+                rearAxle_.stop();
+            }
+            // else go stright without stopping
+            else
+            {
+                continue;
+            }
+        }
+
     }
 
     LOG_INFO("Robot", "Exploration is complete")
@@ -61,9 +89,16 @@ void Robot::stop()
 }
 
 
-void Robot::reachCenter()
+bool Robot::nextCenterReached()
 {
+    double spaceTraveled = 0;
 
+    while(spaceTraveled > (odometry_.wheelSpaceTraveled(time, speed) % 180.0f))
+    {
+        spaceTraveled = (odometry_.wheelSpaceTraveled(time, speed) % 180.0f)
+        return false;
+    }
+    return true;
 }
 
 

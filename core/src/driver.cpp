@@ -29,3 +29,15 @@ void Axle::stop()
     motor_left.stop();
     motor_right.stop();
 }
+
+
+bool Axle::prepareNextMove()
+{
+
+}
+
+
+bool Axle::NextMove()
+{
+
+}
