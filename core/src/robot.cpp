@@ -16,41 +16,62 @@ bool Robot::explore()
     Direction next;
     Position myPosition = navigator_.getPosition();
 
-    // use navigation to find the goal
-    while(!maze.isGoal(myPosition.x, myPosition.y)
+    // get centered in (0,0)
+    if(initializePosition())
     {
-        next = solver_.nextStep(const mazeGrid& maze, const Position& actual_position); // next is the rotation to perform
-        rearAxle_.prepareNextMove(next); // rotate
-        odometry_.takeTime(); // inizializza cronometro per odometria ruote
-        odometry_.updateSensorLastMeasure(frontSensor_.read()); // initialize front sensor for odometry
-
-        rearAxle_.move_forward() // Move forward into next corridor
-        rearAxle_.nextCenterReached(); // 
-
-        // Almost reaching the next center cell: update navigation position and set walls
-        if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM * 0.9)
+        // use navigation to find the goal
+        while(!maze.isGoal(myPosition.x, myPosition.y)
         {
-            navigator_.setPosition(/* TODO ADJUST NEXT to be Position, not Direction */);
-            navigator_.updateWalls(maze, myPosition.x, myPosition.y, myPosition.heading);
-            next = solver_.nextStep(maze, actual_position); // be prepared for next action
-        }
+            // Orient robot direction
+            next = solver_.nextStep(maze, myPosition); // next is the rotation to perform
+            rearAxle_.prepareNextMove(next); // rotate
+            navigator_.setHeading(myPosition); //update heading
 
-        // Reach next center cell with wheelSpaceTraveled(time, speed) = CELL_SIZE_MM and iterate the while loop
-        if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM)
-        {
-            // if turn available/necessary, be ready to stop
-            if (myPosition.heading != next)
-            {
-                //stop, next iteration you'll turn
-                rearAxle_.stop();
-            }
-            // else go stright without stopping
-            else
-            {
-                continue;
-            }
-        }
+            // Initialize odometry
+            odometry_.takeTime(); // inizializza cronometro per odometria ruote
+            odometry_.updateSensorLastMeasure(frontSensor_.read()); // initialize front sensor for odometry
 
+            // Move ahead
+            rearAxle_.move_forward() // Move forward into next corridor
+            rearAxle_.nextCenterReached(); // 
+
+            // Almost reaching the next center cell: update navigation position and set walls
+            if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM * 0.9)
+            {
+                if(!maze.isBoarder(myPosition.x, myPosition.y, myPosition.heading))
+                {    
+                    navigator_.setPosition(maze.adiacentCell(myPosition));  // update navigation position
+                }
+                else
+                {
+                    LOG_ERROR("Position", "I cannot go beyond the border");
+                }
+                navigator_.updateWalls(maze, myPosition.x, myPosition.y, myPosition.heading);
+                next = solver_.nextStep(maze, actual_position); // be prepared for next action
+            }
+
+            // Reach next center cell with wheelSpaceTraveled(time, speed) = CELL_SIZE_MM and iterate the while loop
+            if(odometry_.wheelSpaceTraveled(time, speed) >= CELL_SIZE_MM)
+            {
+                // if turn available/necessary, be ready to stop
+                if (myPosition.heading != next)
+                {
+                    //stop, next iteration you'll turn
+                    rearAxle_.stop();
+                }
+                // else go stright without stopping
+                else
+                {
+                    continue;
+                }
+            }
+
+        }
+    }
+    else
+    {
+        LOG_ERROR("Position", "Initialization position (0,0) failed");
+        return false;
     }
 
     LOG_INFO("Robot", "Exploration is complete")
@@ -65,6 +86,12 @@ bool Robot::sprint()
     return true;
 }
 
+
+bool Robot::initializePosition()
+{
+    // Verify to be in a blind spot
+    // Center in the cell
+}
 
 void Robot::rotateByDegrees(float degrees)
 {

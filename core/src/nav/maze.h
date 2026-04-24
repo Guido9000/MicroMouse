@@ -33,6 +33,7 @@ extern "C" class mazeGrid
         bool isBoarder(uint8_t x, uint8_t y, Direction dir) const;
         bool hasWall(uint8_t x, uint8_t y, Direction dir) const;
         void setWallCell(uint8_t x, uint8_t y, Direction dir);
+        Position adiacentCell(uint8_t x, uint8_t y, Direction dir) const;
         bool setNeighbor(uint8_t x, uint8_t y, Direction dir);
         bool isVisited(uint8_t x, uint8_t y) const;
         void setVisited(uint8_t x, uint8_t y);

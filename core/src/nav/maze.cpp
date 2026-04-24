@@ -53,23 +53,51 @@ void mazeGrid::setWallCell(uint8_t x, uint8_t y, Direction dir)
 }
 
 
-bool mazeGrid::setNeighbor(uint8_t x, uint8_t y, Direction dir)
+Position mazeGrid::adiacentCell(uint8_t x, uint8_t y, Direction dir) const
 {
-    // No adiacent cell in such direction
-    if(isBoarder(x, y, dir))    {return false;}
+    Position adiacentPosition;
+    uint8_t x_tmp = x;
+    uint8_t y_tmp = y;
 
     // TODO Check axis
     //Move to adiacent cell
-    if(dir == NORTH)     {y += 1;}
-    else if(dir == SOUTH){y -= 1;}
-    else if(dir == EAST) {x += 1;}
-    else if(dir == WEST) {x -= 1;}
+    if(dir == NORTH)     {y_tmp += 1;}
+    else if(dir == SOUTH){y_tmp -= 1;}
+    else if(dir == EAST) {x_tmp += 1;}
+    else if(dir == WEST) {x_tmp -= 1;}
 
-    setWallCell(x, y, backDirection(dir));
-
-    LOG_VERBOSE("Maze", "The wall in the neighbor cell is set");
-    return true;
+    LOG_VERBOSE("Maze", "Adiacent cell coordinates: "); //TODO fix
+    return adiacentPosition;
 }
+
+
+bool mazeGrid::setNeighbor(uint8_t x, uint8_t y, Direction dir)
+{
+    Position adiacentPosition;
+
+    // No adiacent cell in such direction
+    if(!isBoarder(x, y, dir))
+    {
+        // // TODO Check axis
+        // //Move to adiacent cell
+        // if(dir == NORTH)     {y += 1;}
+        // else if(dir == SOUTH){y -= 1;}
+        // else if(dir == EAST) {x += 1;}
+        // else if(dir == WEST) {x -= 1;}
+
+        adiacentPosition = adiacentCell(x, y, dir)
+        setWallCell(adiacentPosition.x, adiacentPosition.y, backDirection(dir));
+
+        LOG_VERBOSE("Maze", "The wall in the neighbor cell is set");
+        return true;
+    }
+    else
+    {
+        LOG_VERBOSE("Maze", "You're at the boarder, no adiacent cell");
+        return false;
+    }
+}
+
 
 bool mazeGrid::isVisited(uint8_t x, uint8_t y) const
 {

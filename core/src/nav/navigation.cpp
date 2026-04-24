@@ -17,6 +17,13 @@ bool Navigation::setPosition(Position new_position)
 {
     actual_position_.x = new_position.x;
     actual_position_.y = new_position.y;
+
+    return true;
+}
+
+
+bool Navigation::setHeading(Position new_position)
+{
     actual_position_.heading = new_position.heading;
 
     return true;

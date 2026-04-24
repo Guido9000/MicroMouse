@@ -17,6 +17,7 @@ extern "C" class Navigation
 { 
     public:
         bool setPosition(Position new_position);
+        bool setHeading(Position new_position);
         Position getPosition() const;
 
         bool updateWalls(mazeGrid& maze, const Sonar& front_S, const Sonar& left_S, const Sonar& right_S);

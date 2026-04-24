@@ -37,6 +37,7 @@ bool Motor::setSpeed(int throttle)
 }
 
 
+// convert throttle in PWM signal
 int Motor::speedToDuty(int throttle)
 {
     int full_throttle = 100;
