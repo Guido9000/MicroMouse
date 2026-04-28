@@ -2,7 +2,7 @@
 #include "driver/gpio.h"    //General Purpose Input/Output
 #include "esp_log.h"
 
-#include "inc/main.h"
+#include "main.h"
 #include "pin.h"
 #include <thread>
 #include <chrono>
@@ -34,11 +34,11 @@
 TaskHandle_t FrontSensor;
 SemaphoreHandle_t xSemaphore = NULL;
 //TaskHandle_t Task2Handle = NULL;
-static Sonar sonar_front(SEN_TRIG, SEN_ECHO, "front");
-static SensorTaskParams front_params = {
-    .sonar = &sonar_front,
-    .name = "front"
-};
+// static Sonar sonar_front(SEN_TRIG, SEN_ECHO, "front");
+// static SensorTaskParams front_params = {
+//     .sonar = &sonar_front,
+//     .name = "front"
+// };
 
 using namespace std;
 
@@ -72,8 +72,11 @@ extern "C" void app_main(void)
         // {
         //     cout << "Program complete: " << esp_timer_get_time()/1000 << endl;
         // }
+        while(true)
+        {
+            my_main.loop();
+        }
 
-        my_main.loop();
     //    i++;
     //}
 
@@ -88,9 +91,9 @@ esp_err_t Main::setup(void)
 
     esp_err_t status{ESP_OK};
     //Non crea un nuovo oggetto locale, ma usa l’operatore di assegnazione per copiare i valori dentro il membro esistente.
-    front_axle = Axle(MOT_SLP_PIN, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "front");
-                        //trig,      echo
-    sonar_front = Sonar(SEN_TRIG, SEN_ECHO, "front");
+    // front_axle = Axle(MOT_SLP_PIN, GPIO_NUM_26, GPIO_NUM_14, GPIO_NUM_25, GPIO_NUM_33, "front");
+    //                     //trig,      echo
+    // sonar_front = Sonar(SEN_TRIG, SEN_ECHO, "front");
     
     /*xTaskCreatePinnedToCore(
     sonar_front.read_distance,             // Task function
@@ -124,18 +127,22 @@ void Main::hello_world(esp_chip_info_t chip_info)
 
 void Main::loop(void)
 {
-    float dist = 0;
+    // float dist = 0;
 
-    dist = sonar_front.read();
-    cout << dist << " cm" << endl;
-    if(dist < 0)
-    {
-        front_axle.stop();
-    }
-    else{
-        front_axle.move_forward();
-    }
-    
+    // dist = sonar_front.read();
+    // cout << dist << " cm" << endl;
+    // if(dist < 0)
+    // {
+    //     front_axle.stop();
+    // }
+    // else{
+    //     front_axle.move_forward();
+    // }
+    cout << "Pisellini" << endl;
+
+    robot_.test();
+    // robot_.explore();
+
     vTaskDelay(pdSECOND);
 }
 

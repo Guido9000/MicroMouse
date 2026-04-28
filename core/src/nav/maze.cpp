@@ -67,6 +67,10 @@ Position mazeGrid::adiacentCell(uint8_t x, uint8_t y, Direction dir) const
     else if(dir == WEST) {x_tmp -= 1;}
 
     LOG_VERBOSE("Maze", "Adiacent cell coordinates: "); //TODO fix
+    adiacentPosition.x = x_tmp;
+    adiacentPosition.y = y_tmp;
+    adiacentPosition.heading = dir;
+    
     return adiacentPosition;
 }
 
@@ -85,7 +89,7 @@ bool mazeGrid::setNeighbor(uint8_t x, uint8_t y, Direction dir)
         // else if(dir == EAST) {x += 1;}
         // else if(dir == WEST) {x -= 1;}
 
-        adiacentPosition = adiacentCell(x, y, dir)
+        adiacentPosition = adiacentCell(x, y, dir);
         setWallCell(adiacentPosition.x, adiacentPosition.y, backDirection(dir));
 
         LOG_VERBOSE("Maze", "The wall in the neighbor cell is set");

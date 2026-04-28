@@ -18,14 +18,14 @@ bool Sonar::sonar_setup()
 }
 
 
-bool Sonar::theresWall()
+bool Sonar::theresWall() const
 {
     if(read() < MAX_WALL_DIST){return true;}
     else{return false;}
 }
 
 
-float Sonar::read()
+float Sonar::read() const
 {
     int64_t start = 0;
     int64_t end = 0;

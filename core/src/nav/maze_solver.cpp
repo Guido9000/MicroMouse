@@ -1,20 +1,15 @@
 #include "maze_solver.h"
-#include "maze.h"
-#include "navigation.h"
-
 
 
 // Given a position in the maze, get the next move following the righthand rule
 Direction RightHandSolver::nextStep(const mazeGrid& maze, const Position& actual_position)
 {
-    Navigation nav;
     Direction actual_direction = actual_position.heading;
 
-    Direction right   = nav.turnRight(actual_direction);
+    Direction right   = rightDirection(actual_direction);
     Direction forward = actual_direction;
-    Direction left    = nav.turnLeft(actual_direction);
-    Direction back    = nav.turnBack(actual_direction);
-
+    Direction left    = leftDirection(actual_direction);
+    Direction back    = backDirection(actual_direction);
 
     // Turn right if possible
     if(!maze.hasWall(actual_position.x, actual_position.y, right))

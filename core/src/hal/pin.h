@@ -5,9 +5,9 @@
 #define BLINK_PERIOD CONFIG_BLINK_PERIOD    //
 
 // Define driver slp
-#define MOT_SLP_PIN GPIO_NUM_22
+#define MOT_SLP_PIN GPIO_NUM_26
 // Define the control inputs
-#define MOT_A1_PIN GPIO_NUM_26
+#define MOT_A1_PIN GPIO_NUM_22
 #define MOT_A2_PIN GPIO_NUM_14
 #define MOT_B1_PIN GPIO_NUM_25
 #define MOT_B2_PIN GPIO_NUM_33
@@ -18,13 +18,14 @@
 
 
 // PWM for motors
-#define MOTOR_PWM_FREQ  1000                  // Frequency in Hz for PWM
-#define MOTOR_PWM_CHANNEL LEDC_CHANNEL_0
+#define MOTOR_PWM_FREQ  1000                  // Frequency in Hz for PWM [freq = 10000–20000 Hz]
+// #define MOTOR_PWM_CHANNEL LEDC_CHANNEL_0
+// #define MOTOR_PWM_CHAN_2 LEDC_CHANNEL_1
 #define MOTOR_PWM_MODE   LEDC_HIGH_SPEED_MODE
-#define MOTOR_PWM_TIMER  LEDC_TIMER_0
-#define MOTOR_PWM_RES    LEDC_TIMER_10_BIT    // PWM resolution (10-bit)    //TODO reduce to LEDC_TIMER_8_BIT
-#define MAX_DUTY_CYCLE   1023                 // Maximum duty cycle for 10-bit resolution //TODO 8bit 1023 -> 255
-#define MIN_DUTY_CYCLE   600
+#define MOTOR_PWM_TIMER  LEDC_TIMER_0        // Available timers [0-3]
+#define MOTOR_PWM_RES    LEDC_TIMER_8_BIT    // PWM resolution (8-bit)
+#define MAX_DUTY_CYCLE   255                 // Maximum duty cycle for 8-bit resolution
+#define MIN_DUTY_CYCLE   100
 ///////////////////////////////////////////////////////////
 
 

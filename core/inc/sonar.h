@@ -4,7 +4,7 @@
 #include <string>
 #include "driver/gpio.h"
 #include "esp_timer.h"
-#include "sonar.h"
+#include "config.h"
 
 extern "C" class Sonar
 { 
@@ -16,8 +16,8 @@ extern "C" class Sonar
             if(sonar_setup()){std::cout << name << " sonar is online" << std::endl;}
         }
 
-        bool theresWall();
-        float read();
+        bool theresWall() const;
+        float read() const;
 
     private:
         int p_trigPin;

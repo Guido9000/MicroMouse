@@ -1,11 +1,6 @@
 #include <bitset>
 
 #include "navigation.h"
-#include "mock_sensor.h"
-#include "config.h"
-#include "maze.h"
-#include "direction.h"
-
 
 Position Navigation::getPosition() const
 {
@@ -36,15 +31,15 @@ bool Navigation::updateWalls(mazeGrid& maze, const Sonar& front_S, const Sonar& 
     Direction left = leftDirection(actual_position_.heading);
     Direction right = rightDirection(actual_position_.heading);
 
-    if(front_S.thereswall())
+    if(front_S.theresWall())
     {
         maze.setWall(actual_position_.x, actual_position_.y, ahead);
     }
-    if(left_S.thereswall())
+    if(left_S.theresWall())
     {
         maze.setWall(actual_position_.x, actual_position_.y, left);
     }
-    if(right_S.thereswall())
+    if(right_S.theresWall())
     {
         maze.setWall(actual_position_.x, actual_position_.y, right);
     }

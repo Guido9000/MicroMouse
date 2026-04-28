@@ -4,6 +4,11 @@
 #include "maze.h"
 #include "log.h"
 #include "navigation.h"
+#include "direction.h"
+
+struct Position;
+class mazeGrid;
+class Sonar; 
 
 // Polimorphism: ISolver virtual -> append the desired algorithm
 extern "C" class ISolver
