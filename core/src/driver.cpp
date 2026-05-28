@@ -1,5 +1,3 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "driver.h"
 
 
@@ -16,21 +14,19 @@ bool Axle::driver_setup()
 
 void Axle::move_forward(int throttle)
 {
-    // float speed;    // TODO Pass speed through the function
-    // speed = 0;
+    int duty_cycle = motor_left.speedToDuty(throttle);
 
-    motor_left.rotate_forward(throttle);
-    motor_right.rotate_forward(throttle);
+    motor_left.rotate_forward(duty_cycle);
+    motor_right.rotate_forward(duty_cycle);
 }
 
 
-void Axle::move_backward()
+void Axle::move_backward(int throttle)
 {
-    // float speed;    // TODO Pass speed through the function
-    // speed = 0;
+    int duty_cycle = motor_left.speedToDuty(throttle);
 
-    motor_left.rotate_backward();
-    motor_right.rotate_backward();
+    motor_left.rotate_backward(duty_cycle);
+    motor_right.rotate_backward(duty_cycle);
 }
 
 
@@ -42,9 +38,28 @@ void Axle::stop()
 
 
 // 90 degrees rotation
-bool Axle::prepareNextMove(Direction next)
+bool Axle::rotate(float angle)
 {
+    int throttle = SPEED_ROTATION;
+    int duty_cycle = motor_left.speedToDuty(throttle);
+
     // Rotate L/R/Back
+    if(angle > 0)
+    {
+        motor_left.rotate_forward(duty_cycle);
+        motor_right.rotate_backward(duty_cycle);
+        vTaskDelay(pdMS_TO_TICKS(200));
+        motor_left.stop();
+        motor_right.stop();
+    }
+    else if(angle < 0)
+    {
+        motor_left.rotate_backward(duty_cycle);
+        motor_right.rotate_forward(duty_cycle);
+        vTaskDelay(pdMS_TO_TICKS(200));
+        motor_left.stop();
+        motor_right.stop();    
+    }
 
     return true;
 }

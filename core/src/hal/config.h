@@ -23,3 +23,5 @@ constexpr float PID_SPEED_KD         = 0.01f;
 
 constexpr float SPEED_EXPLORE_MM_S   = 150.0f;
 constexpr float SPEED_SPRINT_MM_S    = 400.0f;
+
+constexpr int SPEED_ROTATION   = 10;

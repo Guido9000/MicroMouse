@@ -7,14 +7,20 @@
 // Define driver slp
 #define MOT_SLP_PIN GPIO_NUM_26
 // Define the control inputs
-#define MOT_A1_PIN GPIO_NUM_22
-#define MOT_A2_PIN GPIO_NUM_14
-#define MOT_B1_PIN GPIO_NUM_25
-#define MOT_B2_PIN GPIO_NUM_33
+// DX motor. Inverted pins for correct direction
+#define MOT_A2_PIN GPIO_NUM_27
+#define MOT_A1_PIN GPIO_NUM_14
+// SX motor. Inverted pins for correct direction
+#define MOT_B1_PIN GPIO_NUM_33
+#define MOT_B2_PIN GPIO_NUM_25
 
 // Define the front sensor inputs
 #define SEN_TRIG GPIO_NUM_18
-#define SEN_ECHO GPIO_NUM_34
+#define SEN_ECHO GPIO_NUM_19
+
+// Define the IR sensor inputs
+#define r_IRSEN_AN GPIO_NUM_35
+#define l_IRSEN_AN GPIO_NUM_34
 
 
 // PWM for motors

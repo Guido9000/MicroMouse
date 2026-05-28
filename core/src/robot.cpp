@@ -3,18 +3,32 @@
 
 bool Robot::test()
 {
+
     // rearAxle_.rotate_forward();
-    std::cout << "Chiappette: " << frontSensor_.read() << std::endl;
-    if(!frontSensor_.theresWall())
-    {
-        std::cout << "free space" << std::endl;
-        rearAxle_.move_forward(frontSensor_.read());
-    }
-    else
-    {
-        std::cout << "wall" << std::endl;
+    // std::cout << "Front sensor: " << frontSensor_.read() << std::endl;
+    std::cout << "Left sensor: " << leftSensor_.read() << std::endl;
+    std::cout << "Right sensor: " << rightSensor_.read() << std::endl;
+
+    // vTaskDelay(pdMS_TO_TICKS(40));
+
+    // if(!frontSensor_.theresWall())
+    // {
+    //     std::cout << "free space" << std::endl;
+        rearAxle_.move_forward(40);
+        vTaskDelay(pdMS_TO_TICKS(2000));
         rearAxle_.stop();
-    }
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        rearAxle_.move_backward(40);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        rearAxle_.stop();
+        // rearAxle_.rotate(90.0);
+    // }
+    // else
+    // {
+    //     std::cout << "wall" << std::endl;
+    //     rearAxle_.rotate(90.0);
+    //     // rearAxle_.stop();
+    // }
 
     return true;
 }
@@ -24,6 +38,8 @@ bool Robot::explore()
 {
     float time = 0; // TODO substitute with clock
     float speed = 0; // TODO substitute speed
+    float angle = 0;
+
     Direction next;
     Position myPosition = navigator_.getPosition();
 
@@ -36,7 +52,8 @@ bool Robot::explore()
             // Orient robot direction
             /* FRECCINA!!!! */
             next = solver_->nextStep(maze_, myPosition); // next is the rotation to perform
-            rearAxle_.prepareNextMove(next); // rotate
+            // angle = navigator_.calculateRotation(myPosition.heading, next);
+            rearAxle_.rotate(angle); // rotate
             navigator_.setHeading(myPosition); //update heading
 
             // Initialize odometry

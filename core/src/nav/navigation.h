@@ -21,7 +21,7 @@ extern "C" class Navigation
         bool setHeading(Position new_position);
         Position getPosition() const;
 
-        bool updateWalls(mazeGrid& maze, const Sonar& front_S, const Sonar& left_S, const Sonar& right_S);
+        bool updateWalls(mazeGrid& maze, const Sonar& front_S, const IRSensor& left_S, const IRSensor& right_S);
 
     private:
         Position actual_position_ = {.x = 0 , .y = 0, .heading = NORTH};

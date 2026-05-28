@@ -2,9 +2,11 @@
 
 #include <iostream>
 #include <string>
-#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "motor.h"
 #include "direction.h"
+#include "config.h"
 
 extern "C" class Axle
 { 
@@ -19,10 +21,10 @@ extern "C" class Axle
             if(driver_setup()){std::cout << name << " axle is online" << std::endl;}
         }
 
-        bool prepareNextMove(Direction next);
+        bool rotate(float angle);
         bool NextMove();
         void move_forward(int throttle);
-        void move_backward();
+        void move_backward(int throttle);
         void stop();
         void printAxlePins();
 

@@ -138,7 +138,6 @@ void Main::loop(void)
     // else{
     //     front_axle.move_forward();
     // }
-    cout << "Pisellini" << endl;
 
     robot_.test();
     // robot_.explore();

@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "driver/gpio.h"
 #include "driver/ledc.h"  // For PWM control
 #include "pin.h"
@@ -25,8 +27,9 @@ extern "C" class Motor
 
         /* Methods */
         bool setSpeed(int throttle);
-        void rotate_forward(int throttle);
-        void rotate_backward();
+        void rotate_forward(int duty_cycle);
+        void rotate_backward(int duty_cycle);
+        int speedToDuty(int throttle);
         void brake();
         void stop();
         void testAcceleration();
@@ -40,7 +43,6 @@ extern "C" class Motor
         
         static void init_pwm_timer_once();
         bool motor_setup();
-        int speedToDuty(int throttle);
         void setup_gpio();
         void setup_pwm(ledc_channel_t ch, int pin);
 };

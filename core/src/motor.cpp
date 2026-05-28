@@ -1,5 +1,3 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "motor.h"
 
 
@@ -50,12 +48,8 @@ void Motor::setup_pwm(ledc_channel_t ch, int pin)
 }
 
 
-void Motor::rotate_forward(int throttle)
+void Motor::rotate_forward(int duty_cycle)
 {
-    int duty_cycle = speedToDuty(throttle);
-
-        std::cout << "throttle: " << throttle << " duty: " << duty_cycle << std::endl;
-
         // Set PWM duty cycle to control speed
         ledc_set_duty(MOTOR_PWM_MODE, ch_in1, duty_cycle);
         ledc_update_duty(MOTOR_PWM_MODE, ch_in1);
@@ -66,9 +60,14 @@ void Motor::rotate_forward(int throttle)
 }
 
 
-void Motor::rotate_backward()
+void Motor::rotate_backward(int duty_cycle)
 {
-    // copy rotate_forward()
+        // Set PWM duty cycle to control speed
+        ledc_set_duty(MOTOR_PWM_MODE, ch_in1, 0);
+        ledc_update_duty(MOTOR_PWM_MODE, ch_in1);
+
+        ledc_set_duty(MOTOR_PWM_MODE, ch_in2, duty_cycle);
+        ledc_update_duty(MOTOR_PWM_MODE, ch_in2);
 }
 
 
