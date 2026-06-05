@@ -135,13 +135,13 @@ bool Robot::init()
     // 2,                  task priority
     // &task2_handle,      task handle (to interact with the task from outside)
     xTaskCreate(sSensorTask, "Sensors", 8192, this, 4, &sensorTaskHandle_);
-    xTaskCreate(sUSSensorTask, "US Sensors", 4096, this, 4, &USsensorTaskHandle_);
-    xTaskCreate(sIRSensor_LTask, "IR Sensors left", 4096, this, 3, &IRsensor_LTaskHandle_);
-    xTaskCreate(sIRSensor_RTask, "IR Sensors right", 4096, this, 3, &IRsensor_RTaskHandle_);
-    xTaskCreate(sMotorTask, "Motors", 4096, this, 2, &motorTaskHandle_);
-    xTaskCreate(sNavTask, "Navigation", 8192, this, 1, &navTaskHandle_);
-    xTaskCreate(sOdometryTask, "Odometry", 8192, this, 1, &odometryTaskHandle_);
-    xTaskCreate(sBlinkTask, "Blink", 4096, this, 0, &blinkTaskHandle_);
+    xTaskCreate(UsSensor::sUSSensorTask, "US Sensors", 4096, &frontSensor_, 4, &USsensorTaskHandle_);
+    xTaskCreate(IRSensor::sIRSensorTask, "IR Sensors left", 4096, &leftSensor_, 3, &IRsensor_LTaskHandle_);
+    xTaskCreate(IRSensor::sIRSensorTask, "IR Sensors right", 4096, &rightSensor_, 3, &IRsensor_RTaskHandle_);
+    // xTaskCreate(sMotorTask, "Motors", 4096, this, 2, &motorTaskHandle_);
+    // xTaskCreate(sNavTask, "Navigation", 8192, this, 1, &navTaskHandle_);
+    // xTaskCreate(sOdometryTask, "Odometry", 8192, this, 1, &odometryTaskHandle_);
+    // xTaskCreate(sBlinkTask, "Blink", 4096, this, 0, &blinkTaskHandle_);
 
     frontSensor_.setQueue(usQueue_, sensorTaskHandle_);
     leftSensor_.setQueue(irLQueue_, sensorTaskHandle_);
@@ -155,12 +155,12 @@ bool Robot::init()
 void Robot::sSensorTask(void* instance) {
     static_cast<Robot*>(instance)->sensorLoop();
 }
-void Robot::sMotorTask(void* instance) {
-    static_cast<Robot*>(instance)->motorLoop();
-}
-void Robot::sNavTask(void* instance) {
-    static_cast<Robot*>(instance)->navLoop();
-}
+// void Robot::sMotorTask(void* instance) {
+//     static_cast<Robot*>(instance)->motorLoop();
+// }
+// void Robot::sNavTask(void* instance) {
+//     static_cast<Robot*>(instance)->navLoop();
+// }
 
 
 // void Robot::sensorLoop() {
@@ -195,7 +195,7 @@ void Robot::sensorLoop() {
     {
         esp_task_wdt_reset();
 
-        xTaskNotifyGive(USsensorTaskHandle_);
+        // xTaskNotifyGive(USsensorTaskHandle_);
         // xTaskNotifyGive(IRsensor_LTaskHandle_);
 
         SensorReading r;
@@ -263,7 +263,7 @@ bool Robot::explore()
 
             // Initialize odometry
             odometry_.takeTime(time); // inizializza cronometro per odometria ruote
-            odometry_.updateSensorLastMeasure(frontSensor_.read()); // initialize front sensor for odometry
+            // odometry_.updateSensorLastMeasure(frontSensor_.read()); // initialize front sensor for odometry
 
             // Move ahead
             rearAxle_.move_forward(100); // Move forward into next corridor

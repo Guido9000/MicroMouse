@@ -29,7 +29,7 @@ class Sensor
         virtual ~Sensor() = default;
 
         virtual bool theresWall() const = 0;
-        virtual float read() const = 0;
+        virtual float read() const;
     
     protected:  // can be called from this class and derived classes
         std::string p_name;
@@ -54,6 +54,7 @@ class UsSensor : public Sensor
             if(ussensor_setup()){std::cout << name << " ultrasound sensor  is online" << std::endl;}
         }
 
+        static void sUSSensorTask(void* instance);
         bool theresWall() const override;
         float read() const override;
 
@@ -67,8 +68,8 @@ class UsSensor : public Sensor
         TaskHandle_t USsensorTaskHandle_ = NULL;
 
         bool ussensor_setup();
-        static void sUSSensorTask(void* instance);
-        void sonarTask(void* instance);
+        
+        void sonarTask();
         static void IRAM_ATTR echo_isr(void* instance);
 
 };
@@ -83,6 +84,7 @@ class IRSensor : public Sensor
             if(irsensor_setup()){std::cout << name << " IR sensor is online" << std::endl;}
         }
 
+        static void sIRSensorTask(void* instance);
         bool theresWall() const override;
         float read() const override;
 
@@ -92,5 +94,6 @@ class IRSensor : public Sensor
         adc_channel_t p_adc_channel;
 
         bool irsensor_setup();
-        void irTask(void* instance);
+
+        void irTask();
 };

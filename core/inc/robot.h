@@ -26,6 +26,7 @@ class Robot
             rightSensor_(ADC_CHANNEL_7, "right"),
             solver_(new RightHandSolver)
         {}
+        
         bool test();
         bool init();    // Tasks init
         void deinit();  // Tasks destructor
@@ -67,6 +68,9 @@ class Robot
         TaskHandle_t blinkTaskHandle_       = NULL;
 
         // Code di comunicazione
+        QueueHandle_t usQueue_      = NULL;
+        QueueHandle_t irLQueue_     = NULL;
+        QueueHandle_t irRQueue_     = NULL;
         QueueHandle_t sensorQueue_  = NULL;
         QueueHandle_t commandQueue_ = NULL;
 
@@ -75,14 +79,14 @@ class Robot
         static void sUSSensorTask(void* instance);
         static void sIRSensor_LTask(void* instance);
         static void sIRSensor_RTask(void* instance);
-        static void sMotorTask(void* instance);
-        static void sNavTask(void* instance);
-        static void sOdometryTask(void* instance);
-        static void sBlinkTask(void* instance);
+        // static void sMotorTask(void* instance);
+        // static void sNavTask(void* instance);
+        // static void sOdometryTask(void* instance);
+        // static void sBlinkTask(void* instance);
 
         // Implementazioni reali
         void sensorLoop();
-        void motorLoop();
-        void navLoop();
+        // void motorLoop();
+        // void navLoop();
 
 };

@@ -6,6 +6,17 @@ adc_oneshot_unit_handle_t IRSensor::adc1_handle = nullptr;
 bool IRSensor::adc_initialized = false;
 
 
+// Trampolines
+// Trampolines are the public entry point that FreeRTOS calls from outside
+// The real loop is an internal function which is then private
+void UsSensor::sUSSensorTask(void* instance) {
+    static_cast<UsSensor*>(instance)->sonarTask();
+}
+void IRSensor::sIRSensorTask(void* instance) {
+    static_cast<IRSensor*>(instance)->irTask();
+}
+
+
 bool UsSensor::ussensor_setup()
 {
     // Turn on the sensor
@@ -29,6 +40,11 @@ bool UsSensor::ussensor_setup()
     return true;
 }
 
+float UsSensor::read() const
+{
+
+    return 0.0f;
+}
 
 bool UsSensor::theresWall() const
 {
@@ -37,55 +53,7 @@ bool UsSensor::theresWall() const
 }
 
 
-//CHATTY
-// float UsSensor::read_OLD() const
-// {
-//     int64_t start = 0;
-//     int64_t end = 0;
-
-//     // Trigger
-//     gpio_set_level((gpio_num_t)p_trigPin, 0);
-//     esp_rom_delay_us(4);
-
-//     gpio_set_level((gpio_num_t)p_trigPin, 1);
-//     esp_rom_delay_us(10);
-//     gpio_set_level((gpio_num_t)p_trigPin, 0);
-
-//     int64_t t0 = esp_timer_get_time();
-
-//     // Set timeout for echo
-//     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-//     while (gpio_get_level((gpio_num_t)p_echoPin) == 0)
-//     {
-//         if (esp_timer_get_time() - t0 > 120000)
-//         {
-//             LOG_ERROR("Ultrasound sensor ", "Error in echo switch on")
-//             return -1; // timeout: no echo
-//         }
-//     }
-
-//     start = esp_timer_get_time();
-
-//     // Wait for timeout descend
-//     while (gpio_get_level((gpio_num_t)p_echoPin) == 1)
-//     {
-//         if (esp_timer_get_time() - start > 120000)
-//         {
-//             LOG_ERROR("Ultrasound sensor ", "Error in echo switch off")
-//             return -1; // timeout: anomalous signal
-//         }
-//     }
-
-//     end = esp_timer_get_time();
-
-//     int64_t duration = end - start;
-//     float distance = duration / 58.0f;
-
-//     return distance;
-// }
-
-
-void UsSensor::sonarTask(void* pv)
+void UsSensor::sonarTask()
 {
     for (;;)
     {
@@ -102,12 +70,12 @@ void UsSensor::sonarTask(void* pv)
 
         // check for the rise of echo
         if(!ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(120))) {
-            sendReading(-1.0f);  // timeout
+            sendReading(-1.0);  // timeout
             continue;
         }
         // check for the fall of echo
         if(!ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(120))) {
-            sendReading(-1.0f);  // timeout
+            sendReading(-1.0);  // timeout
             continue;
         }
 
@@ -188,7 +156,7 @@ bool IRSensor::theresWall() const
 }
 
 
-void IRSensor::irTask(void* pv)
+void IRSensor::irTask()
 {
     int mean_val = 0;
 
