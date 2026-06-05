@@ -25,7 +25,7 @@ bool Navigation::setHeading(Position new_position)
 }
 
 
-bool Navigation::updateWalls(mazeGrid& maze, const Sonar& front_S, const IRSensor& left_S, const IRSensor& right_S)
+bool Navigation::updateWalls(mazeGrid& maze, const UsSensor& front_S, const IRSensor& left_S, const IRSensor& right_S)
 {
     Direction ahead = actual_position_.heading;
     Direction left = leftDirection(actual_position_.heading);

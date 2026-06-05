@@ -1,26 +1,108 @@
 #include "robot.h"
 
 
+// xTaskCreatePinnedToCore(
+//     task1,              // function name
+//     "Task sensors",     // task name
+//     8192,               // stack size in bytes (increase for large functions)
+// NULL,                   // task input
+//     3,                  // task priority
+//     &task1_handle,      // task handle (to interact with the task from other tasks)
+//     1                   // core
+// );
+
+// xTaskCreatePinnedToCore(
+// task2,                  // function name
+// "Task motors",          // task name
+//     8192,               // stack size in bytes (increase for large functions)
+//     NULL,               // task input
+//     2,                  // task priority
+//     &task2_handle,      // task handle (to interact with the task from outside)
+//     0                   // core
+// );
+
+// xTaskCreatePinnedToCore(
+//     task3,              // function name
+//     "Task navigation",  // task name
+//     8192,               // stack size in bytes (increase for large functions)
+//     NULL,               // task input
+//     1,                  // task priority
+//     &task3_handle,      // task handle (to interact with the task from other tasks)
+//     0                   // core
+// );
+
+
+// int count1 = 0;
+// int count2 = 0;
+// TaskHandle_t task1_handle = NULL;
+
+// void task1 (void* parameters)
+// {
+//     // add task to watchdog list
+//     esp_task_wdt_add(NULL);
+
+//     for(;;)
+//     {
+//         // reset watchdog timer
+//         esp_task_wdt_reset();
+//         LOG_INFO("Task 1 count ", count1);
+
+//         count1++;
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+//     }
+
+//     // delete task from watchdog list
+//     esp_task_wdt_delete(NULL);
+// }
+
+// void task2 (void* parameters)
+// {
+//     // add task to watchdog list
+//     esp_task_wdt_add(NULL);
+
+//     for(;;)
+//     {
+//         // reset watchdog timer
+//         esp_task_wdt_reset();
+//         LOG_INFO("Task 2 count ", count2);
+
+//         count2++;
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+//     }
+    
+//     // delete task from watchdog list
+//     esp_task_wdt_delete(NULL);
+// }
+
 bool Robot::test()
 {
 
+    // if(count1 > 2 && task1_handle != NULL && count2 < 5)
+    // {
+    //     vTaskSuspend(task1_handle);
+    // }
+    // if(count2 == 10 && task1_handle != NULL)
+    // {
+    //     vTaskResume(task1_handle);
+    // }
+
     // rearAxle_.rotate_forward();
     // std::cout << "Front sensor: " << frontSensor_.read() << std::endl;
-    std::cout << "Left sensor: " << leftSensor_.read() << std::endl;
-    std::cout << "Right sensor: " << rightSensor_.read() << std::endl;
+    // std::cout << "Left sensor: " << leftSensor_.read() << std::endl;
+    // std::cout << "Right sensor: " << rightSensor_.read() << std::endl;
 
     // vTaskDelay(pdMS_TO_TICKS(40));
 
     // if(!frontSensor_.theresWall())
     // {
     //     std::cout << "free space" << std::endl;
-        rearAxle_.move_forward(40);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        rearAxle_.stop();
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        rearAxle_.move_backward(40);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        rearAxle_.stop();
+        // rearAxle_.move_forward(40);
+        // vTaskDelay(pdMS_TO_TICKS(2000));
+        // rearAxle_.stop();
+        // vTaskDelay(pdMS_TO_TICKS(2000));
+        // rearAxle_.move_backward(40);
+        // vTaskDelay(pdMS_TO_TICKS(2000));
+        // rearAxle_.stop();
         // rearAxle_.rotate(90.0);
     // }
     // else
@@ -32,6 +114,129 @@ bool Robot::test()
 
     return true;
 }
+
+
+bool Robot::init()
+{
+    // crea le code prima dei task
+    commandQueue_ = xQueueCreate(5, sizeof(Direction));
+
+    // single sensor queue
+    usQueue_   = xQueueCreate(1, sizeof(float));
+    irLQueue_  = xQueueCreate(1, sizeof(float));
+    irRQueue_  = xQueueCreate(1, sizeof(float));
+    sensorQueue_ = xQueueCreate(5, sizeof(SensorReading));
+
+    // create tasks
+    // sMotorTask,         function name
+    // "Task motors",      task name
+    // 8192,               stack size in bytes (increase for large functions)
+    // NULL,               task input
+    // 2,                  task priority
+    // &task2_handle,      task handle (to interact with the task from outside)
+    xTaskCreate(sSensorTask, "Sensors", 8192, this, 4, &sensorTaskHandle_);
+    xTaskCreate(sUSSensorTask, "US Sensors", 4096, this, 4, &USsensorTaskHandle_);
+    xTaskCreate(sIRSensor_LTask, "IR Sensors left", 4096, this, 3, &IRsensor_LTaskHandle_);
+    xTaskCreate(sIRSensor_RTask, "IR Sensors right", 4096, this, 3, &IRsensor_RTaskHandle_);
+    xTaskCreate(sMotorTask, "Motors", 4096, this, 2, &motorTaskHandle_);
+    xTaskCreate(sNavTask, "Navigation", 8192, this, 1, &navTaskHandle_);
+    xTaskCreate(sOdometryTask, "Odometry", 8192, this, 1, &odometryTaskHandle_);
+    xTaskCreate(sBlinkTask, "Blink", 4096, this, 0, &blinkTaskHandle_);
+
+    frontSensor_.setQueue(usQueue_, sensorTaskHandle_);
+    leftSensor_.setQueue(irLQueue_, sensorTaskHandle_);
+    rightSensor_.setQueue(irRQueue_, sensorTaskHandle_);
+
+    return true;
+}
+
+
+// trampolini — convertono void* in Robot* e chiamano il metodo reale
+void Robot::sSensorTask(void* instance) {
+    static_cast<Robot*>(instance)->sensorLoop();
+}
+void Robot::sMotorTask(void* instance) {
+    static_cast<Robot*>(instance)->motorLoop();
+}
+void Robot::sNavTask(void* instance) {
+    static_cast<Robot*>(instance)->navLoop();
+}
+
+
+// void Robot::sensorLoop() {
+//     esp_task_wdt_add(NULL);
+
+    // for(;;) {
+    //     esp_task_wdt_reset();
+
+    //     sSensorTask();
+
+    //     // Start frontal measure
+    //     .frontMM = sUSSensorTask();    // frontSensor_.getDistanceMM();
+    //     .leftMM  = sIRSensor_LTask();  // leftSensor_.getDistanceMM();
+    //     .rightMM = sIRSensor_RTask();  // rightSensor_.getDistanceMM();
+        
+    //     SensorReading reading = {
+    //         .frontMM = frontSensor_.getDistanceMM(),
+    //         .leftMM  = leftSensor_.getDistanceMM(),
+    //         .rightMM = rightSensor_.getDistanceMM()
+    //     };
+    //     xQueueSend(sensorQueue_, &reading, 0);
+
+    //     vTaskDelay(pdMS_TO_TICKS(50));
+//     }
+// }
+
+
+void Robot::sensorLoop() {
+    esp_task_wdt_add(NULL);
+
+    for (;;)
+    {
+        esp_task_wdt_reset();
+
+        xTaskNotifyGive(USsensorTaskHandle_);
+        // xTaskNotifyGive(IRsensor_LTaskHandle_);
+
+        SensorReading r;
+
+        xQueueReceive(sensorQueue_, &r, portMAX_DELAY);
+
+        // usa dati
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
+
+// void Robot::navLoop() {
+//     esp_task_wdt_add(NULL);
+//     SensorReading reading;
+//     for(;;) {
+//         esp_task_wdt_reset();
+
+//         if(xQueueReceive(sensorQueue_, &reading, pdMS_TO_TICKS(100))) {
+//             navigator_.updateWalls(maze_, reading);
+//             Direction next = solver_->nextMove(maze_, navigator_.getPosition());
+//             xQueueSend(commandQueue_, &next, 0);
+//         }
+
+//         vTaskDelay(pdMS_TO_TICKS(100));
+//     }
+// }
+
+// void Robot::motorLoop() {
+//     esp_task_wdt_add(NULL);
+//     Direction command;
+//     for(;;) {
+//         esp_task_wdt_reset();
+
+//         if(xQueueReceive(commandQueue_, &command, pdMS_TO_TICKS(100))) {
+//             rearAxle_.move(command);
+//         }
+
+//         vTaskDelay(pdMS_TO_TICKS(10));
+//     }
+// }
 
 
 bool Robot::explore()

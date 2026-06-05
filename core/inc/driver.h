@@ -8,7 +8,7 @@
 #include "direction.h"
 #include "config.h"
 
-extern "C" class Axle
+class Axle
 { 
     public:
         // Axle() = default;

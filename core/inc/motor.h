@@ -11,7 +11,7 @@
 
 
 
-extern "C" class Motor
+class Motor
 { 
     public:
         explicit Motor(gpio_num_t InPin1, gpio_num_t InPin2, ledc_channel_t ch1, ledc_channel_t ch2, const std::string& name)

@@ -3,11 +3,10 @@
 #include <iostream>
 #include "config.h"
 #include "log.h"
-// #include "sonar.h"
 
 
 // Estimate physical position
-extern "C" class Odometry
+class Odometry
 { 
     public:
         // update values

@@ -33,12 +33,6 @@
 //////////////////// OLD TEST PER INIZIARE
 TaskHandle_t FrontSensor;
 SemaphoreHandle_t xSemaphore = NULL;
-//TaskHandle_t Task2Handle = NULL;
-// static Sonar sonar_front(SEN_TRIG, SEN_ECHO, "front");
-// static SensorTaskParams front_params = {
-//     .sonar = &sonar_front,
-//     .name = "front"
-// };
 
 using namespace std;
 
@@ -84,10 +78,11 @@ extern "C" void app_main(void)
     vTaskDelete(FrontSensor);
 }
 
+
 esp_err_t Main::setup(void)
 {
     // Initialize the serial UART at 115200 baud
-    //Serial.begin(115200);
+    // Serial.begin(115200);
 
     esp_err_t status{ESP_OK};
     //Non crea un nuovo oggetto locale, ma usa l’operatore di assegnazione per copiare i valori dentro il membro esistente.
@@ -104,7 +99,16 @@ esp_err_t Main::setup(void)
     &FrontSensor,      // Task handle
     1                  // Core 1
   );*/
+
+    // Setup the watchdog
+    esp_task_wdt_config_t wdt_config = {
+        .timeout_ms = 30000,
+        .idle_core_mask = 0,    // do not monitor idle tasks
+        .trigger_panic = true   // restart if watchdog is triggered
+    };
+    esp_task_wdt_reconfigure(&wdt_config);
  
+    robot_.init();
     ESP_LOGI(LOG_TAG, "Setup complete!");
     
     return status;
@@ -139,39 +143,10 @@ void Main::loop(void)
     //     front_axle.move_forward();
     // }
 
+    cout << "Start robot test" << endl;
+    
     robot_.test();
-    // robot_.explore();
+    // // robot_.explore();
 
-    vTaskDelay(pdSECOND);
+    // vTaskDelay(pdSECOND);
 }
-
-/*void Task_sensors(void* pvParameters)
-{
-    int front;
-    int read_state = 0;
-
-    while(true)
-    {
-        switch(read_state) {
-            case 0:
-                front = sonar_front.read();
-                read_state = 1;
-                break;
-
-            case 1:
-                //left = sonar_left.read();
-                read_state = 2;
-                break;
-
-            case 2:
-                //right = sonar_right.read();
-                read_state = 0;
-                break;
-        }
-
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
-
-    vTaskDelete(NULL);
-}
-*/

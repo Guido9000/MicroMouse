@@ -18,7 +18,7 @@ struct maze_cell
 };
 
 // struttura dati labirinto
-extern "C" class mazeGrid
+class mazeGrid
 { 
     public:
         void setWall(uint8_t x, uint8_t y, Direction dir);

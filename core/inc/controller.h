@@ -5,7 +5,7 @@
 
 /* The degrees of rotation are clockwise following the compass */
 
-extern "C" class Controller
+class Controller
 { 
     public:
         void init();

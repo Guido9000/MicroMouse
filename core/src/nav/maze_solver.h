@@ -8,10 +8,10 @@
 
 struct Position;
 class mazeGrid;
-class Sonar; 
+class Sensor; 
 
 // Polimorphism: ISolver virtual -> append the desired algorithm
-extern "C" class ISolver
+class ISolver
 { 
     public:
         virtual ~ISolver() = default;        // distruttore virtuale, implementazione default
@@ -20,7 +20,7 @@ extern "C" class ISolver
 };
 
 
-extern "C" class RightHandSolver : public ISolver
+class RightHandSolver : public ISolver
 { 
     public:
         Direction nextStep(const mazeGrid& maze, const Position& actual_position) override;
@@ -28,7 +28,7 @@ extern "C" class RightHandSolver : public ISolver
     private:
 };
 
-extern "C" class FloodFillSolver : public ISolver
+class FloodFillSolver : public ISolver
 { 
     public:
 

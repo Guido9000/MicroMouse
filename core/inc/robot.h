@@ -3,10 +3,12 @@
 #include <iostream>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
+#include "esp_task_wdt.h"
 #include "driver/gpio.h"
 #include "navigation.h"
 #include "driver.h"
-#include "sonar.h"
+#include "sensor.h"
 #include "maze_solver.h"
 #include "maze.h"
 #include "odometry.h"
@@ -14,7 +16,7 @@
 
 class Axle;
 
-extern "C" class Robot
+class Robot
 { 
     public:
         Robot()
@@ -25,15 +27,17 @@ extern "C" class Robot
             solver_(new RightHandSolver)
         {}
         bool test();
+        bool init();    // Tasks init
+        void deinit();  // Tasks destructor
         bool explore();
         bool sprint();
 
     private:
         // Hardware
-        Axle    rearAxle_;
-        Sonar   frontSensor_;
-        IRSensor   leftSensor_;
-        IRSensor   rightSensor_;
+        Axle        rearAxle_;
+        UsSensor    frontSensor_;
+        IRSensor    leftSensor_;
+        IRSensor    rightSensor_;
 
         // Navigation
         mazeGrid    maze_;
@@ -51,4 +55,34 @@ extern "C" class Robot
         float calibrateDist();
         void keepEqDistance();
         bool initializePosition();
+
+        // Task handles
+        TaskHandle_t sensorTaskHandle_      = NULL;
+        TaskHandle_t USsensorTaskHandle_    = NULL;
+        TaskHandle_t IRsensor_LTaskHandle_  = NULL;
+        TaskHandle_t IRsensor_RTaskHandle_  = NULL;
+        TaskHandle_t motorTaskHandle_       = NULL;
+        TaskHandle_t navTaskHandle_         = NULL;
+        TaskHandle_t odometryTaskHandle_    = NULL;
+        TaskHandle_t blinkTaskHandle_       = NULL;
+
+        // Code di comunicazione
+        QueueHandle_t sensorQueue_  = NULL;
+        QueueHandle_t commandQueue_ = NULL;
+
+        // Trampolini statici — entry point per FreeRTOS
+        static void sSensorTask(void* instance);
+        static void sUSSensorTask(void* instance);
+        static void sIRSensor_LTask(void* instance);
+        static void sIRSensor_RTask(void* instance);
+        static void sMotorTask(void* instance);
+        static void sNavTask(void* instance);
+        static void sOdometryTask(void* instance);
+        static void sBlinkTask(void* instance);
+
+        // Implementazioni reali
+        void sensorLoop();
+        void motorLoop();
+        void navLoop();
+
 };

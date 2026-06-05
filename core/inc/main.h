@@ -11,16 +11,13 @@
 #include "esp_chip_info.h"  //
 #include "esp_flash.h"
 #include "esp_system.h"
+#include "esp_task_wdt.h"
 #include "esp_log.h"    //
 // #include "interfaces.h"
 #include "morse.h"
-// #include "motor.h"
-// #include "driver.h"
-// #include "sonar.h"
 #include "robot.h"
-#include "tasks.h"
-// #include "hal/pin.h"
-// #include "hal/config.h"
+
+
 
 #define pdSECOND pdMS_TO_TICKS(1000)
 
