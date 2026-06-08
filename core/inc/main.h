@@ -17,28 +17,7 @@
 #include "morse.h"
 #include "robot.h"
 
-
-
 #define pdSECOND pdMS_TO_TICKS(1000)
-
-
-// class Main final {
-// public:
-//     // Riceve le dipendenze dall'esterno — non le crea lui
-//     Main(IDistanceSensor& frontSensor, IDrive& drive)
-//         : frontSensor_(frontSensor), drive_(drive) {}
-
-//     esp_err_t setup();
-//     void      loop();
-
-// private:
-//     IDistanceSensor& frontSensor_;
-//     IDrive&          drive_;
-// };
-
-void Task_sensors(void* pvParameters);
-void vTask2(void* pvParameters);
-void vTaskN(void* pvParameters);
 
 class Main final
 {
@@ -51,10 +30,5 @@ class Main final
         Robot robot_;
 
     private:
-        
-        // build as a member of class Main, configure it in setup. It'll be not destroyed at the end of setup
-        // Axle front_axle{0, 0, 0, 0, 0, "undefined"};    //GRAFFE!
-        // Axle rear_axle{0, 0, 0, 0, 0, "undefined"};
-        // Sonar sonar_front{0, 0, "undefined"};
-    
+     
 };

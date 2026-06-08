@@ -11,6 +11,7 @@
 #include "sensor.h"
 #include "maze_solver.h"
 #include "maze.h"
+#include "morse.h"
 #include "odometry.h"
 #include "controller.h"
 
@@ -27,11 +28,12 @@ class Robot
             solver_(new RightHandSolver)
         {}
         
-        bool test();
         bool init();    // Tasks init
         void deinit();  // Tasks destructor
+        bool test();
         bool explore();
         bool sprint();
+        void ending_loop();
 
     private:
         // Hardware
@@ -58,6 +60,7 @@ class Robot
         bool initializePosition();
 
         // Task handles
+        TaskHandle_t robotTaskHandle_       = NULL;
         TaskHandle_t sensorTaskHandle_      = NULL;
         TaskHandle_t USsensorTaskHandle_    = NULL;
         TaskHandle_t IRsensor_LTaskHandle_  = NULL;
@@ -67,14 +70,15 @@ class Robot
         TaskHandle_t odometryTaskHandle_    = NULL;
         TaskHandle_t blinkTaskHandle_       = NULL;
 
-        // Code di comunicazione
+        // Queue for communication
         QueueHandle_t usQueue_      = NULL;
         QueueHandle_t irLQueue_     = NULL;
         QueueHandle_t irRQueue_     = NULL;
         QueueHandle_t sensorQueue_  = NULL;
         QueueHandle_t commandQueue_ = NULL;
 
-        // Trampolini statici — entry point per FreeRTOS
+        // Static trampolines
+        static void sRobotTask(void* instance);
         static void sSensorTask(void* instance);
         static void sUSSensorTask(void* instance);
         static void sIRSensor_LTask(void* instance);
@@ -84,7 +88,7 @@ class Robot
         // static void sOdometryTask(void* instance);
         // static void sBlinkTask(void* instance);
 
-        // Implementazioni reali
+        // Actual loop
         void sensorLoop();
         // void motorLoop();
         // void navLoop();

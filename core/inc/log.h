@@ -2,6 +2,7 @@
 
 // #ifdef HOST_BUILD
 #include <iostream>
+#include "esp_log.h"
 
 #define LOG_ERROR(tag, msg) std::cout << "[ERROR] " << tag << ": " << msg << std::endl;
 #define LOG_INFO(tag, msg)  std::cout << "[INFO] " << tag << ": " << msg << std::endl;

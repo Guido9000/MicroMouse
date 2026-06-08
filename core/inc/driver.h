@@ -18,7 +18,7 @@ class Axle
             motor_right(BIN1, BIN2, LEDC_CHANNEL_2, LEDC_CHANNEL_3, "right"),
             p_name(name)
         {
-            if(driver_setup()){std::cout << name << " axle is online" << std::endl;}
+            if(driver_setup()){std::cout << "Axle " << name << " is online" << std::endl;}
         }
 
         bool rotate(float angle);

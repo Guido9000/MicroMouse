@@ -1,4 +1,4 @@
-#define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
+#define LOG_LEVEL_LOCAL ESP_LOG_ERROR
 #include "driver/gpio.h"    //General Purpose Input/Output
 #include "esp_log.h"
 
@@ -33,6 +33,7 @@
 //////////////////// OLD TEST PER INIZIARE
 TaskHandle_t FrontSensor;
 SemaphoreHandle_t xSemaphore = NULL;
+int general_flag = 0;
 
 using namespace std;
 
@@ -49,10 +50,11 @@ extern "C" void app_main(void)
     gpio_reset_pin((gpio_num_t)BLINK_GPIO);
     gpio_set_direction((gpio_num_t)BLINK_GPIO, GPIO_MODE_OUTPUT);
 
+    // Setup main
     ESP_ERROR_CHECK(my_main.setup());
-    my_main.hello_world(chip_info);
+    // my_main.hello_world(chip_info);
 
-    convert_to_morse("SOS", BLINK_GPIO);
+    // convert_to_morse("SOS", BLINK_GPIO);
 
     //int i = 0;
     //while (i < 1)
@@ -107,10 +109,11 @@ esp_err_t Main::setup(void)
         .trigger_panic = true   // restart if watchdog is triggered
     };
     esp_task_wdt_reconfigure(&wdt_config);
- 
-    robot_.init();
-    ESP_LOGI(LOG_TAG, "Setup complete!");
     
+    if(robot_.init())
+    {
+        ESP_LOGI(LOG_TAG, "Setup complete!");
+    }
     return status;
 }
 
@@ -131,22 +134,17 @@ void Main::hello_world(esp_chip_info_t chip_info)
 
 void Main::loop(void)
 {
-    // float dist = 0;
 
-    // dist = sonar_front.read();
-    // cout << dist << " cm" << endl;
-    // if(dist < 0)
-    // {
-    //     front_axle.stop();
-    // }
-    // else{
-    //     front_axle.move_forward();
-    // }
-
-    cout << "Start robot test" << endl;
-    
-    robot_.test();
-    // // robot_.explore();
-
-    // vTaskDelay(pdSECOND);
+    if(general_flag == 0)
+    {
+        cout << "Start robot test" << endl;    
+        robot_.test();
+        general_flag = 1;
+    }
+    else
+    {
+        cout << "Goodbye" << endl;  
+        robot_.ending_loop();
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }

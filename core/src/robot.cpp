@@ -1,127 +1,36 @@
 #include "robot.h"
 
-
-// xTaskCreatePinnedToCore(
-//     task1,              // function name
-//     "Task sensors",     // task name
-//     8192,               // stack size in bytes (increase for large functions)
-// NULL,                   // task input
-//     3,                  // task priority
-//     &task1_handle,      // task handle (to interact with the task from other tasks)
-//     1                   // core
-// );
-
-// xTaskCreatePinnedToCore(
-// task2,                  // function name
-// "Task motors",          // task name
-//     8192,               // stack size in bytes (increase for large functions)
-//     NULL,               // task input
-//     2,                  // task priority
-//     &task2_handle,      // task handle (to interact with the task from outside)
-//     0                   // core
-// );
-
-// xTaskCreatePinnedToCore(
-//     task3,              // function name
-//     "Task navigation",  // task name
-//     8192,               // stack size in bytes (increase for large functions)
-//     NULL,               // task input
-//     1,                  // task priority
-//     &task3_handle,      // task handle (to interact with the task from other tasks)
-//     0                   // core
-// );
-
-
-// int count1 = 0;
-// int count2 = 0;
-// TaskHandle_t task1_handle = NULL;
-
-// void task1 (void* parameters)
-// {
-//     // add task to watchdog list
-//     esp_task_wdt_add(NULL);
-
-//     for(;;)
-//     {
-//         // reset watchdog timer
-//         esp_task_wdt_reset();
-//         LOG_INFO("Task 1 count ", count1);
-
-//         count1++;
-//         vTaskDelay(pdMS_TO_TICKS(1000));
-//     }
-
-//     // delete task from watchdog list
-//     esp_task_wdt_delete(NULL);
-// }
-
-// void task2 (void* parameters)
-// {
-//     // add task to watchdog list
-//     esp_task_wdt_add(NULL);
-
-//     for(;;)
-//     {
-//         // reset watchdog timer
-//         esp_task_wdt_reset();
-//         LOG_INFO("Task 2 count ", count2);
-
-//         count2++;
-//         vTaskDelay(pdMS_TO_TICKS(1000));
-//     }
-    
-//     // delete task from watchdog list
-//     esp_task_wdt_delete(NULL);
-// }
-
-bool Robot::test()
-{
-
-    // if(count1 > 2 && task1_handle != NULL && count2 < 5)
-    // {
-    //     vTaskSuspend(task1_handle);
-    // }
-    // if(count2 == 10 && task1_handle != NULL)
-    // {
-    //     vTaskResume(task1_handle);
-    // }
-
-    // rearAxle_.rotate_forward();
-    // std::cout << "Front sensor: " << frontSensor_.read() << std::endl;
-    // std::cout << "Left sensor: " << leftSensor_.read() << std::endl;
-    // std::cout << "Right sensor: " << rightSensor_.read() << std::endl;
-
-    // vTaskDelay(pdMS_TO_TICKS(40));
-
-    // if(!frontSensor_.theresWall())
-    // {
-    //     std::cout << "free space" << std::endl;
-        // rearAxle_.move_forward(40);
-        // vTaskDelay(pdMS_TO_TICKS(2000));
-        // rearAxle_.stop();
-        // vTaskDelay(pdMS_TO_TICKS(2000));
-        // rearAxle_.move_backward(40);
-        // vTaskDelay(pdMS_TO_TICKS(2000));
-        // rearAxle_.stop();
-        // rearAxle_.rotate(90.0);
-    // }
-    // else
-    // {
-    //     std::cout << "wall" << std::endl;
-    //     rearAxle_.rotate(90.0);
-    //     // rearAxle_.stop();
-    // }
-
-    return true;
+// Trampolines
+void Robot::sRobotTask(void* instance) {
+    static_cast<Robot*>(instance)->test();
+}
+void Robot::sSensorTask(void* instance) {
+    static_cast<Robot*>(instance)->sensorLoop();
 }
 
 
+// void Robot::sMotorTask(void* instance) {
+//     static_cast<Robot*>(instance)->motorLoop();
+// }
+// void Robot::sNavTask(void* instance) {
+//     static_cast<Robot*>(instance)->navLoop();
+// }
+
+
+// Constructor -> variables; init() -> hardware.
 bool Robot::init()
 {
-    // crea le code prima dei task
-    commandQueue_ = xQueueCreate(5, sizeof(Direction));
+    // install interrupt GPIO's driver
+    esp_err_t err = gpio_install_isr_service(0);
+    if (err != ESP_OK)
+    {
+        printf("ISR install failed: %s\n", esp_err_to_name(err));
+    }
 
-    // single sensor queue
+    robotTaskHandle_ = xTaskGetCurrentTaskHandle();
+
+    // Queues
+    commandQueue_ = xQueueCreate(5, sizeof(Direction));
     usQueue_   = xQueueCreate(1, sizeof(float));
     irLQueue_  = xQueueCreate(1, sizeof(float));
     irRQueue_  = xQueueCreate(1, sizeof(float));
@@ -134,6 +43,7 @@ bool Robot::init()
     // NULL,               task input
     // 2,                  task priority
     // &task2_handle,      task handle (to interact with the task from outside)
+    // xTaskCreate(sRobotTask, "Robot", 8192, this, 0, &robotTaskHandle_);
     xTaskCreate(sSensorTask, "Sensors", 8192, this, 4, &sensorTaskHandle_);
     xTaskCreate(UsSensor::sUSSensorTask, "US Sensors", 4096, &frontSensor_, 4, &USsensorTaskHandle_);
     xTaskCreate(IRSensor::sIRSensorTask, "IR Sensors left", 4096, &leftSensor_, 3, &IRsensor_LTaskHandle_);
@@ -143,6 +53,16 @@ bool Robot::init()
     // xTaskCreate(sOdometryTask, "Odometry", 8192, this, 1, &odometryTaskHandle_);
     // xTaskCreate(sBlinkTask, "Blink", 4096, this, 0, &blinkTaskHandle_);
 
+    // Set handles for each sensor task
+    frontSensor_.setTaskHandle(USsensorTaskHandle_);
+    leftSensor_.setTaskHandle(IRsensor_LTaskHandle_);
+    rightSensor_.setTaskHandle(IRsensor_RTaskHandle_);
+
+    // Sensors pin setup
+    frontSensor_.ussensor_setup();
+    leftSensor_.irsensor_setup();
+    rightSensor_.irsensor_setup();
+
     frontSensor_.setQueue(usQueue_, sensorTaskHandle_);
     leftSensor_.setQueue(irLQueue_, sensorTaskHandle_);
     rightSensor_.setQueue(irRQueue_, sensorTaskHandle_);
@@ -151,59 +71,64 @@ bool Robot::init()
 }
 
 
-// trampolini — convertono void* in Robot* e chiamano il metodo reale
-void Robot::sSensorTask(void* instance) {
-    static_cast<Robot*>(instance)->sensorLoop();
+bool Robot::test()
+{
+    SensorReading r;
+
+    // IR sensors require an extra ping to be ready
+    xTaskNotifyGive(IRsensor_LTaskHandle_);
+    xTaskNotifyGive(IRsensor_RTaskHandle_);
+    
+    for(int i = 0; i < 100; i++)
+    {
+        // Start orchestrator loop
+        xTaskNotifyGive(sensorTaskHandle_);
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        xQueueReceive(sensorQueue_, &r, portMAX_DELAY);
+
+        if(r.isValid())
+        {
+            r.print();
+        }
+    }
+
+    return true;
 }
-// void Robot::sMotorTask(void* instance) {
-//     static_cast<Robot*>(instance)->motorLoop();
-// }
-// void Robot::sNavTask(void* instance) {
-//     static_cast<Robot*>(instance)->navLoop();
-// }
 
 
-// void Robot::sensorLoop() {
-//     esp_task_wdt_add(NULL);
-
-    // for(;;) {
-    //     esp_task_wdt_reset();
-
-    //     sSensorTask();
-
-    //     // Start frontal measure
-    //     .frontMM = sUSSensorTask();    // frontSensor_.getDistanceMM();
-    //     .leftMM  = sIRSensor_LTask();  // leftSensor_.getDistanceMM();
-    //     .rightMM = sIRSensor_RTask();  // rightSensor_.getDistanceMM();
-        
-    //     SensorReading reading = {
-    //         .frontMM = frontSensor_.getDistanceMM(),
-    //         .leftMM  = leftSensor_.getDistanceMM(),
-    //         .rightMM = rightSensor_.getDistanceMM()
-    //     };
-    //     xQueueSend(sensorQueue_, &reading, 0);
-
-    //     vTaskDelay(pdMS_TO_TICKS(50));
-//     }
-// }
-
-
+// Sensors orchestrator task
 void Robot::sensorLoop() {
+    SensorReading r;
     esp_task_wdt_add(NULL);
+    
+    // Ping for configuration
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    xTaskNotifyStateClear(NULL);
+
+    // Wait for a ping to start
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    LOG_VERBOSE("Sensor Task", "Starting sensor loop")
 
     for (;;)
     {
         esp_task_wdt_reset();
 
-        // xTaskNotifyGive(USsensorTaskHandle_);
-        // xTaskNotifyGive(IRsensor_LTaskHandle_);
+        xTaskNotifyGive(USsensorTaskHandle_);
+        xTaskNotifyGive(IRsensor_LTaskHandle_);
+        xTaskNotifyGive(IRsensor_RTaskHandle_);
 
-        SensorReading r;
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+        xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 
-        xQueueReceive(sensorQueue_, &r, portMAX_DELAY);
+        xQueueReceive(usQueue_, &r.frontal, portMAX_DELAY);
+        xQueueReceive(irLQueue_, &r.left, portMAX_DELAY);
+        xQueueReceive(irRQueue_, &r.right, portMAX_DELAY);
 
-        // usa dati
-        vTaskDelay(pdMS_TO_TICKS(50));
+        xQueueSend(sensorQueue_, &r, 0);
+        xTaskNotifyGive(robotTaskHandle_);
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -441,3 +366,8 @@ void Robot::keepEqDistance()
     //     }
     // }
 } 
+
+void Robot::ending_loop()
+{
+    convert_to_morse("T", BLINK_GPIO);
+}
