@@ -2,25 +2,31 @@
 
 #include <iostream>
 #include <string>
-#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "motor.h"
+#include "direction.h"
+#include "config.h"
 
-extern "C" class Axle
+class Axle
 { 
     public:
-        Axle() = default;
-        explicit Axle(int SLP, int AIN1, int AIN2, int BIN1, int BIN2, std::string name)
+        // Axle() = default;
+        explicit Axle(gpio_num_t SLP, gpio_num_t AIN1, gpio_num_t AIN2, gpio_num_t BIN1, gpio_num_t BIN2, std::string name)
             : p_SLP(SLP), 
-            motor_left(AIN1, AIN2, "left"),
-            motor_right(BIN1, BIN2, "right"),
+            motor_left(AIN1, AIN2, LEDC_CHANNEL_0, LEDC_CHANNEL_1, "left"),
+            motor_right(BIN1, BIN2, LEDC_CHANNEL_2, LEDC_CHANNEL_3, "right"),
             p_name(name)
         {
-            if(driver_setup()){std::cout << name << " axle is online" << std::endl;}
+            if(driver_setup()){std::cout << "Axle " << name << " is online" << std::endl;}
         }
 
-        void move_forward();
-        void move_backward();
+        bool rotate(float angle);
+        bool NextMove();
+        void move_forward(int throttle);
+        void move_backward(int throttle);
         void stop();
+        void printAxlePins();
 
     private:
         int p_SLP;

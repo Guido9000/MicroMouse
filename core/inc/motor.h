@@ -2,25 +2,47 @@
 
 #include <iostream>
 #include <string>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"  // For PWM control
+#include "pin.h"
+#include "log.h"
 
-extern "C" class Motor
+
+
+class Motor
 { 
     public:
-        explicit Motor(int InPin1, int InPin2, const std::string& name)
-            : p_InPin1(InPin1), p_InPin2(InPin2), p_name(name) // initializer list: inizializza direttamente i membri della classe, prima che venga eseguito il corpo del costruttore.
+        explicit Motor(gpio_num_t InPin1, gpio_num_t InPin2, ledc_channel_t ch1, ledc_channel_t ch2, const std::string& name)
+            : p_InPin1(InPin1), p_InPin2(InPin2), ch_in1(ch1), ch_in2(ch2), p_name(name) // initializer list: inizializza direttamente i membri della classe, prima che venga eseguito il corpo del costruttore.
         {
-            if(motor_setup()){std::cout << "Motor " << name << " is online" << std::endl;}
+            init_pwm_timer_once();
+            setup_gpio();
+            setup_pwm(ch_in1, p_InPin1);
+            setup_pwm(ch_in2, p_InPin2);
+        
+            std::cout << "Motor " << name << " is online\n";
         }
 
-        void rotate_forward();
-        void rotate_backward();
+        /* Methods */
+        bool setSpeed(int throttle);
+        void rotate_forward(int duty_cycle);
+        void rotate_backward(int duty_cycle);
+        int speedToDuty(int throttle);
+        void brake();
         void stop();
+        void testAcceleration();
+        void printSleepPins();
+        void printPins();
 
     private:    // non voglio che il codice esterno li chiami per sbaglio
-        int p_InPin1;
-        int p_InPin2;
+        gpio_num_t p_InPin1, p_InPin2;
+        ledc_channel_t ch_in1, ch_in2;
         std::string p_name;
         
+        static void init_pwm_timer_once();
         bool motor_setup();
+        void setup_gpio();
+        void setup_pwm(ledc_channel_t ch, int pin);
 };

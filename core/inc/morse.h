@@ -12,7 +12,7 @@ extern const std::map<char, std::string> ascii_to_morse;
 void convert_to_morse(const std::string& msg, int led_gate);
 void blink_led(const std::string& msg_morse, int led_gate);
 
-extern "C" class MorseLed
+class MorseLed
 {
     //Encapsulation 
     public:

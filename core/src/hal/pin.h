@@ -1,0 +1,58 @@
+#pragma once
+
+// set with idf.py menuconfig
+#define BLINK_GPIO   CONFIG_BLINK_GPIO      //
+#define BLINK_PERIOD CONFIG_BLINK_PERIOD    //
+
+// Define driver slp
+#define MOT_SLP_PIN GPIO_NUM_26
+// Define the control inputs
+// DX motor. Inverted pins for correct direction
+#define MOT_A2_PIN GPIO_NUM_27
+#define MOT_A1_PIN GPIO_NUM_14
+// SX motor. Inverted pins for correct direction
+#define MOT_B1_PIN GPIO_NUM_33
+#define MOT_B2_PIN GPIO_NUM_25
+
+// Define the front sensor inputs
+#define SEN_TRIG GPIO_NUM_18
+#define SEN_ECHO GPIO_NUM_19
+
+// Define the IR sensor inputs
+#define r_IRSEN_AN GPIO_NUM_35
+#define l_IRSEN_AN GPIO_NUM_34
+
+
+// PWM for motors
+#define MOTOR_PWM_FREQ  1000                  // Frequency in Hz for PWM [freq = 10000–20000 Hz]
+// #define MOTOR_PWM_CHANNEL LEDC_CHANNEL_0
+// #define MOTOR_PWM_CHAN_2 LEDC_CHANNEL_1
+#define MOTOR_PWM_MODE   LEDC_HIGH_SPEED_MODE
+#define MOTOR_PWM_TIMER  LEDC_TIMER_0        // Available timers [0-3]
+#define MOTOR_PWM_RES    LEDC_TIMER_8_BIT    // PWM resolution (8-bit)
+#define MAX_DUTY_CYCLE   255                 // Maximum duty cycle for 8-bit resolution
+#define MIN_DUTY_CYCLE   100
+///////////////////////////////////////////////////////////
+
+
+
+// // --- Motori ---
+// constexpr uint8_t PIN_MOTOR_L_PWM   = 12;
+// constexpr uint8_t PIN_MOTOR_L_DIR_A = 13;
+// constexpr uint8_t PIN_MOTOR_L_DIR_B = 14;
+
+// constexpr uint8_t PIN_MOTOR_R_PWM   = 25;
+// constexpr uint8_t PIN_MOTOR_R_DIR_A = 26;
+// constexpr uint8_t PIN_MOTOR_R_DIR_B = 27;
+
+// // --- Encoder ---
+// constexpr uint8_t PIN_ENC_L_A = 34;
+// constexpr uint8_t PIN_ENC_L_B = 35;
+// constexpr uint8_t PIN_ENC_R_A = 36;
+// constexpr uint8_t PIN_ENC_R_B = 39;
+
+// // --- Sensori IR (distanza pareti) ---
+// constexpr uint8_t PIN_IR_FRONT_L = 32;
+// constexpr uint8_t PIN_IR_FRONT_R = 33;
+// constexpr uint8_t PIN_IR_SIDE_L  = 4;
+// constexpr uint8_t PIN_IR_SIDE_R  = 5;
