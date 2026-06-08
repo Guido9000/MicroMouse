@@ -10,26 +10,6 @@
 #define LOG_TAG "MAIN"
 
 
-// esp_err_t Main::setup() {
-//     ESP_LOGI(LOG_TAG, "Setup complete!");
-//     return ESP_OK;
-// }
-
-// void Main::loop() {
-//     float dist = frontSensor_.getDistanceMM();
-
-//     if (dist < 300.0f) {
-//         drive_.stop();
-//     } else {
-//         drive_.moveForward(SPEED_EXPLORE_MM_S);
-//     }
-
-//     // Select clock
-//     std::this_thread::sleep_for(std::chrono::seconds(1));
-//     // vTaskDelay(pdSECOND);
-// }
-
-
 //////////////////// OLD TEST PER INIZIARE
 TaskHandle_t FrontSensor;
 SemaphoreHandle_t xSemaphore = NULL;
